@@ -12,5 +12,11 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2025-06-28
  */
 public interface IUsersService extends IService<Users> {
+    Users findByUserName(String username);
+
+    void register(String username, String password);
+
+
+    void updatePwd(Long userId, String newHashedPassword);
 
 }
