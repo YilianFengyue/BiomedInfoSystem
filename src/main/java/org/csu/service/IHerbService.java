@@ -2,6 +2,7 @@ package org.csu.service;
 
 import org.csu.domain.Herb;
 import org.csu.dto.HerbDistributionDto;
+import org.csu.dto.HerbGrowthDataDto;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -38,4 +39,12 @@ public interface IHerbService extends IService<Herb> {
      * @return 药材分布数据列表
      */
     List<HerbDistributionDto> getHerbDistribution(String province);
+
+    /**
+     * 根据药材ID获取其所有生长数据记录，用于对比分析
+     *
+     * @param herbId 药材ID
+     * @return 药材生长数据列表
+     */
+    List<HerbGrowthDataDto> getGrowthDataForHerb(Long herbId);
 }

@@ -4,7 +4,10 @@ import org.csu.domain.Herb;
 import org.csu.domain.HerbLocation;
 import org.csu.dao.HerbDao;
 import org.csu.dao.HerbLocationDao;
+import org.csu.dao.HerbGrowthDataDao;
+import org.csu.domain.HerbGrowthData;
 import org.csu.dto.HerbDistributionDto;
+import org.csu.dto.HerbGrowthDataDto;
 import org.csu.service.IHerbService;
 import org.csu.config.BusinessException;
 import org.csu.config.SystemException;
@@ -18,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * <p>
@@ -33,6 +37,9 @@ public class HerbServiceImpl extends ServiceImpl<HerbDao, Herb> implements IHerb
     
     @Autowired
     private HerbLocationDao herbLocationDao;
+    
+    @Autowired
+    private HerbGrowthDataDao herbGrowthDataDao;
     
     // ServiceImpl 已经自动注入了 baseMapper (即 HerbDao)，可以直接使用
     @Override
@@ -197,6 +204,67 @@ public class HerbServiceImpl extends ServiceImpl<HerbDao, Herb> implements IHerb
               
         } catch (Exception e) {
             throw new SystemException(Code.SYSTEM_ERR, "系统异常，查询药材分布数据失败", e);
+        }
+    }
+
+    @Override
+    public List<HerbGrowthDataDto> getGrowthDataForHerb(Long herbId) {
+        try {
+            // 1. 参数校验
+            if (herbId == null || herbId <= 0) {
+                throw new BusinessException(Code.VALIDATE_ERR, "药材ID无效");
+            }
+            // 检查药材是否存在
+            if (baseMapper.selectById(herbId) == null) {
+                throw new BusinessException(Code.GET_ERR, "指定的药材不存在");
+            }
+
+            // 2. 根据药材ID查询其所有的观测点
+            QueryWrapper<HerbLocation> locationQuery = new QueryWrapper<>();
+            locationQuery.eq("herb_id", herbId);
+            List<HerbLocation> locations = herbLocationDao.selectList(locationQuery);
+
+            if (locations.isEmpty()) {
+                log.info("药材ID {} 没有关联的观测点", herbId);
+                return List.of();
+            }
+
+            // 3. 提取所有观测点ID，并创建一个从ID到观测点信息的映射
+            List<Long> locationIds = locations.stream().map(HerbLocation::getId).collect(Collectors.toList());
+            Map<Long, HerbLocation> locationMap = locations.stream()
+                    .collect(Collectors.toMap(HerbLocation::getId, location -> location));
+
+            // 4. 根据观测点ID列表查询所有相关的生长数据
+            QueryWrapper<HerbGrowthData> growthDataQuery = new QueryWrapper<>();
+            growthDataQuery.in("location_id", locationIds)
+                           .orderByAsc("recorded_at"); // 按记录时间排序
+            List<HerbGrowthData> growthDataList = herbGrowthDataDao.selectList(growthDataQuery);
+
+            // 5. 将生长数据(HerbGrowthData)和位置信息(HerbLocation)组装成DTO
+            return growthDataList.stream().map(growthData -> {
+                HerbLocation location = locationMap.get(growthData.getLocationId());
+                HerbGrowthDataDto dto = new HerbGrowthDataDto();
+                
+                dto.setGrowthDataId(growthData.getId());
+                dto.setMetricName(growthData.getMetricName());
+                dto.setMetricValue(growthData.getMetricValue());
+                dto.setMetricUnit(growthData.getMetricUnit());
+                dto.setRecordedAt(growthData.getRecordedAt());
+
+                if (location != null) {
+                    dto.setLocationId(location.getId());
+                    dto.setProvince(location.getProvince());
+                    dto.setCity(location.getCity());
+                    dto.setAddress(location.getAddress());
+                    dto.setObservationYear(location.getObservationYear());
+                }
+                return dto;
+            }).collect(Collectors.toList());
+
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new SystemException(Code.SYSTEM_ERR, "系统异常，查询药材生长数据失败", e);
         }
     }
 }

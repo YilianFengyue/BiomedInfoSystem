@@ -2,6 +2,7 @@ package org.csu.controller;
 
 import org.csu.controller.Result;
 import org.csu.dto.HerbDistributionDto;
+import org.csu.dto.HerbGrowthDataDto;
 import org.csu.service.IHerbService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -146,5 +147,17 @@ public class HerbController {
         } catch (Exception e) {
             return Result.error("获取药材图片失败: " + e.getMessage());
         }
+    }
+
+    /**
+     * 获取指定药材的生长数据记录
+     *
+     * @param herbId 药材ID
+     * @return 该药材在所有观测点的生长数据列表
+     */
+    @GetMapping("/{herbId}/growth-data")
+    public Result getGrowthDataForHerb(@PathVariable Long herbId) {
+        List<HerbGrowthDataDto> growthData = herbService.getGrowthDataForHerb(herbId);
+        return new Result(Code.GET_OK, growthData, "查询成功");
     }
 }
