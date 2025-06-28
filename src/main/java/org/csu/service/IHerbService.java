@@ -1,6 +1,7 @@
 package org.csu.service;
 
 import org.csu.domain.Herb;
+import org.csu.dto.HerbDistributionDto;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -29,4 +30,12 @@ public interface IHerbService extends IService<Herb> {
 
     //*查询所有药材信息
     List<Herb> getAllHerbs();
+
+    /**
+     * 获取药材地理分布数据，用于地图可视化
+     * 
+     * @param province 可选参数，按省份筛选，不传则查询全部
+     * @return 药材分布数据列表
+     */
+    List<HerbDistributionDto> getHerbDistribution(String province);
 }
