@@ -72,6 +72,24 @@ public class HerbController {
     }
 
     /**
+     * 根据药材名称智能分页查询
+     *
+     * @param name  查询的药材名称关键字
+     * @param page  当前页码
+     * @param limit 每页数量
+     * @return 分页的药材列表
+     */
+    @GetMapping("/herbs/searchByName")
+    public Result<IPage<Herb>> searchHerbsByName(
+            @RequestParam String name,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer limit) {
+        // 直接复用现有的分页服务，只传入name参数进行模糊查询
+        IPage<Herb> herbPage = herbService.getHerbsByPage(page, limit, name, null, null, null, "name", "asc");
+        return Result.success(herbPage);
+    }
+
+    /**
      * 获取单个药材详情
      * 
      * @param id 药材ID
