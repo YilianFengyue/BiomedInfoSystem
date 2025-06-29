@@ -3,6 +3,8 @@ package org.csu.service;
 import org.csu.domain.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.Map;
+
 /**
  * <p>
  * 用户表 (简化版) 服务类
@@ -18,5 +20,7 @@ public interface IUsersService extends IService<Users> {
 
 
     void updatePwd(Long userId, String newHashedPassword);
+
+    public Users findOrCreateUserByThirdParty(String provider, String providerUserId, Map<String, Object> attributes);
 
 }

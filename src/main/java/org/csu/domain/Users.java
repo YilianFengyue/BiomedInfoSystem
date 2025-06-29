@@ -1,6 +1,7 @@
 package org.csu.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -57,4 +58,7 @@ public class Users implements Serializable {
      * 更新时间
      */
     private LocalDateTime updatedAt;
+
+    @TableField(exist = false) //这个字段在数据库表中不存在
+    private boolean hasPassword;
 }

@@ -3,7 +3,9 @@ package org.csu.controller;
 
 import org.csu.domain.UserProfiles;
 import org.csu.domain.Users;
+import org.csu.dto.SetPasswordDto;
 import org.csu.dto.UpdatePasswordDto;
+import org.csu.service.AuthenticationHelperService;
 import org.csu.service.IUserProfilesService;
 import org.csu.service.IUsersService;
 import org.csu.util.JWTUtil;
@@ -18,8 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+
 
 import static org.csu.controller.Code.*;
 
@@ -36,6 +37,9 @@ public class UserContorller {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private AuthenticationHelperService authHelperService;
 
     @PostMapping("/register")
     public Result register(@RequestBody Users user) {
@@ -78,37 +82,7 @@ public class UserContorller {
             if (!PasswordUtil.checkPassword(user.getPasswordHash(), loginUser.getPasswordHash())) {
                 return new Result(LOGIN_ERR,null,"密码错误");
             } else {
-                // --- 原有JWT逻辑开始 ---
-                Map<String, Object> claims = new HashMap<>();
-                claims.put("id", loginUser.getId());
-                claims.put("username", loginUser.getUsername());
-                String jwtToken = JWTUtil.genToken(claims);
-                // 把JWT Token存储到Redis中 (这部分逻辑可以根据您的实际需求调整)
-                ValueOperations<String, String> stringStringValueOperations = stringRedisTemplate.opsForValue();
-                stringStringValueOperations.set(jwtToken, jwtToken, 12, TimeUnit.HOURS);
-                // --- 原有JWT逻辑结束 ---
-
-
-                // ================= 新增CSRF逻辑开始 =================
-
-                // 1. 生成一个唯一的、不可预测的CSRF Token
-                String csrfToken = UUID.randomUUID().toString().replace("-", "");
-
-                // 2. 将CSRF Token存储到Redis中，与用户身份进行关联
-                //    键的格式建议为 "csrf:用户ID"，这样清晰且不会冲突
-                //    过期时间应与会话或JWT的过期时间保持一致或类似
-                String csrfRedisKey = "csrf:" + loginUser.getId();
-                stringRedisTemplate.opsForValue().set(csrfRedisKey, csrfToken, 12, TimeUnit.HOURS);
-
-                // ================= 新增CSRF逻辑结束 =================
-
-
-                // 3. 准备返回给前端的数据
-                Map<String, String> responseData = new HashMap<>();
-                responseData.put("token", jwtToken); // 这是JWT Token，用于身份认证
-                responseData.put("csrf_token", csrfToken); // 这是CSRF Token，用于后续请求的安全验证
-
-                // 4. 将包含两个Token的Map作为成功结果返回
+                Map<String, String> responseData = authHelperService.handleLoginSuccess(loginUser);
                 return new Result(LOGIN_OK,responseData,"登录成功");
             }
         }
@@ -120,7 +94,6 @@ public class UserContorller {
         Map<String,Object> threadLocal = ThreadLocalUtil.getThreadLocal();
         int id = (int) threadLocal.get("id");
         UserProfiles userProfiles = userProfilesService.getById(id);
-        System.out.println(userProfiles);
 
         return new Result(GET_OK,userProfiles,"获取成功");
 
@@ -165,6 +138,30 @@ public class UserContorller {
         return new Result(UPDATE_OK, null, "更新头像成功"); // 您的Result构造方式
     }
 
+    @PostMapping("set-password")
+    public Result setPassword(@RequestBody @Validated SetPasswordDto passwordDto) {
+        // 确认两次密码输入一致
+        if (!passwordDto.getNew_pwd().equals(passwordDto.getRe_pwd())) {
+            return Result.error("两次输入的新密码不一致");
+        }
+
+        // 从 ThreadLocal 获取当前用户ID
+        Map<String, Object> claims = ThreadLocalUtil.getThreadLocal();
+        Long userId = ((Integer) claims.get("id")).longValue();
+
+        // 确认该用户没有密码
+        Users user = userService.getById(userId);
+        if (!"OAUTH2_USER".equals(user.getPasswordHash())) {
+            return Result.error("操作失败：您的账户已设置密码，请使用“修改密码”功能。");
+        }
+
+        // 更新密码
+        String newHashedPassword = PasswordUtil.hashPassword(passwordDto.getNew_pwd());
+        userService.updatePwd(userId, newHashedPassword);
+
+        return Result.success("登录密码设置成功！");
+    }
+
     @PatchMapping("/updatePwd")
     public Result updatePwd(@RequestBody @Validated UpdatePasswordDto passwordDto, @RequestHeader("Authorization") String token) {
         // 1. 确认新密码是否一致
@@ -177,8 +174,12 @@ public class UserContorller {
         String username = (String) claims.get("username");
         Long userId = ((Integer) claims.get("id")).longValue();
 
+        String storedPasswordHash = userService.getById(userId).getPasswordHash();
+        if ("OAUTH2_USER".equals(storedPasswordHash)) {
+            return Result.error("操作失败：您的账户尚未设置密码，请使用“设置密码”功能。");
+        }
+
         // 3. 校验原密码
-        String storedPasswordHash = userService.getById(userId).getPasswordHash(); // 直接通过ID获取，更高效
         if (!PasswordUtil.checkPassword(passwordDto.getOld_pwd(), storedPasswordHash)) {
             return new Result(UPDATE_ERR, null, "原密码填写错误");
         }
