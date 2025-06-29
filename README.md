@@ -57,67 +57,80 @@
     }
     ```
 
-### **1.2 保存图片及地点信息**
+### **1.2 [新] 观测点与图片上传流程**
 
-在前端成功将文件上传到OSS后，调用此接口，将文件的URL和相关的地点信息一并保存到后端数据库。这是一个事务性操作。
+为了解决同一次观测中，上传多张图片会创建重复地理位置信息的问题，现采用新的两步式上传流程。旧的 `POST /api/herb/herbs/images` 接口已废弃。
 
-*   **Endpoint**: `POST /api/herb/herbs/images`
+#### **第一步：创建观测点**
+
+*   **Endpoint**: `POST /api/herb/locations`
 *   **方法**: `POST`
-*   **描述**: 保存一张新的药草图片URL及其关联的观测点信息。
+*   **描述**: 提交地理位置等信息，创建一个新的观测点记录。
 *   **请求体 (Request Body)**: `application/json`
-
     ```json
     {
       "herbId": 1,
-      "url": "https://your-bucket.oss-cn-beijing.aliyuncs.com/user-uploads/image.jpg",
-      "longitude": 116.404269,
-      "latitude": 39.913169,
+      "longitude": 116.404,
+      "latitude": 39.913,
       "province": "北京市",
-      "observationYear": 2024,
-      "isPrimary": false,
       "city": "北京市",
-      "address": "详细地址",
-      "description": "图片描述"
+      "address": "故宫博物院",
+      "observationYear": 2024,
+      "description": "第一次观测"
     }
     ```
-
-*   **请求体字段说明**:
-
-| 字段名 | 类型 | 是否必需 | 描述 |
-|---|---|---|---|
-| `herbId` | Number | **是** | 关联的药草ID |
-| `url` | String | **是** | 图片的OSS访问URL |
-| `longitude` | Number | **是** | 经度 |
-| `latitude` | Number | **是** | 纬度 |
-| `province` | String | **是** | 省份 |
-| `observationYear` | Number | **是** | 观测年份 |
-| `isPrimary` | Boolean | 否 | 是否为主图，默认为false |
-| `city` | String | 否 | 城市 |
-| `address` | String | 否 | 详细地址 |
-| `description` | String | 否 | 图片描述 |
-
-*   **成功响应 (200 OK)**: 返回被成功保存的图片对象，包含了数据库生成的ID。
+*   **成功响应 (200 OK)**: 返回创建成功的观测点对象，**客户端必须记录返回的 `id`**，用于第二步。
     ```json
     {
         "code": 20000,
         "data": {
-            "id": 5,
+            "id": 15, // <--- 这个是关键的 locationId
             "herbId": 1,
-            "locationId": 12,
-            "url": "https://your-bucket.oss-cn-beijing.aliyuncs.com/user-uploads/image.jpg",
-            "isPrimary": false,
-            "description": "图片描述",
-            "uploadedAt": "2025-06-29T12:00:00"
+            "longitude": 116.404,
+            "latitude": 39.913,
+            "province": "北京市",
+            "city": "北京市",
+            "address": "故宫博物院",
+            "observationYear": 2024,
+            "description": "第一次观测",
+            "createdAt": "2025-06-30T10:00:00"
         },
-        "msg": "图片及地点信息保存成功"
+        "msg": "操作成功"
     }
     ```
-*   **校验失败响应 (400 Bad Request)**:
+
+#### **第二步：为观测点上传图片**
+
+*   **Endpoint**: `POST /api/herb/locations/{locationId}/images`
+*   **方法**: `POST`
+*   **描述**: 为一个已存在的观测点批量关联图片。
+*   **路径参数**: `{locationId}` (第一步操作返回的观测点ID)。
+*   **请求体 (Request Body)**: `application/json`
     ```json
     {
-        "code": 20060,
-        "data": null,
-        "msg": "药草ID不能为空; 观测年份不能为空"
+      "images": [
+        {
+          "url": "https://<bucket>.oss-cn-beijing.aliyuncs.com/path/to/image1.jpg",
+          "isPrimary": true,
+          "description": "植株正面"
+        },
+        {
+          "url": "https://<bucket>.oss-cn-beijing.aliyuncs.com/path/to/image2.jpg",
+          "isPrimary": false,
+          "description": "叶片特写"
+        }
+      ]
+    }
+    ```
+*   **成功响应 (200 OK)**: 返回被成功保存的图片对象列表。
+    ```json
+    {
+        "code": 20000,
+        "data": [
+            { "id": 21, "herbId": 1, "locationId": 15, "url": "...", "isPrimary": true, ... },
+            { "id": 22, "herbId": 1, "locationId": 15, "url": "...", "isPrimary": false, ... }
+        ],
+        "msg": "操作成功"
     }
     ```
 

@@ -5,11 +5,15 @@ import jakarta.validation.Valid;
 import org.csu.domain.Herb;
 import org.csu.domain.HerbImage;
 import org.csu.domain.HerbGrowthData;
+import org.csu.domain.HerbLocation;
 import org.csu.dto.HerbDistributionDto;
 import org.csu.dto.HerbDto;
 import org.csu.dto.HerbGrowthDataDto;
+import org.csu.dto.ImageBatchUploadDto;
 import org.csu.dto.ImageUploadDto;
+import org.csu.dto.LocationCreateDto;
 import org.csu.service.IHerbImageService;
+import org.csu.service.IHerbLocationService;
 import org.csu.service.IHerbService;
 import org.csu.service.IHerbGrowthDataService;
 import org.springframework.beans.BeanUtils;
@@ -36,7 +40,35 @@ public class HerbController {
     private IHerbImageService herbImageService;
 
     @Autowired
+    private IHerbLocationService herbLocationService;
+
+    @Autowired
     private IHerbGrowthDataService growthDataService;
+
+    /**
+     * 第一步：创建一个新的观测点
+     * @param createDto 包含观测点信息的DTO
+     * @return 创建成功后的观测点信息，包含其唯一ID
+     */
+    @PostMapping("/locations")
+    public Result<HerbLocation> createLocation(@Valid @RequestBody LocationCreateDto createDto) {
+        HerbLocation createdLocation = herbLocationService.createLocation(createDto);
+        return Result.success(createdLocation);
+    }
+
+    /**
+     * 第二步：为一个已存在的观测点批量上传图片
+     * @param locationId 观测点ID
+     * @param uploadDto 包含图片列表的DTO
+     * @return 成功保存的图片信息列表
+     */
+    @PostMapping("/locations/{locationId}/images")
+    public Result<List<HerbImage>> uploadImagesForLocation(
+            @PathVariable Long locationId,
+            @Valid @RequestBody ImageBatchUploadDto uploadDto) {
+        List<HerbImage> savedImages = herbImageService.saveImagesForLocation(locationId, uploadDto);
+        return Result.success(savedImages);
+    }
 
     /**
      * 获取药材地理分布数据 (用于地图可视化)
@@ -159,17 +191,6 @@ public class HerbController {
     @GetMapping("/herbs/{herbId}/images")
     public Result<List<String>> getHerbImages(@PathVariable Long herbId) {
         return Result.success(herbImageService.getImagesByHerbId(herbId));
-    }
-
-    /**
-     * 保存一张新的药材图片及其关联的地点信息
-     * @param uploadDto 包含图片和地点信息的DTO
-     * @return 操作结果
-     */
-    @PostMapping("/herbs/images")
-    public Result<HerbImage> saveImageWithLocation(@Valid @RequestBody ImageUploadDto uploadDto) {
-        HerbImage savedImage = herbImageService.saveImageAndLocation(uploadDto);
-        return new Result<>(Code.SUCCESS, savedImage, "图片及地点信息保存成功");
     }
 
     /**

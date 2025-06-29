@@ -5,14 +5,17 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.csu.dao.HerbImageDao;
 import org.csu.domain.HerbImage;
 import org.csu.domain.HerbLocation;
-import org.csu.dto.ImageUploadDto;
+import org.csu.dto.ImageBatchUploadDto;
+import org.csu.dto.ImageInfoDto;
 import org.csu.service.IHerbImageService;
 import org.csu.service.IHerbLocationService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,34 +50,28 @@ public class HerbImageServiceImpl extends ServiceImpl<HerbImageDao, HerbImage> i
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class) // 保证事务性，任何异常都会导致回滚
-    public HerbImage saveImageAndLocation(ImageUploadDto uploadDto) {
-        // 第一步：创建并保存HerbLocation实体
-        HerbLocation location = new HerbLocation();
-        location.setHerbId(uploadDto.getHerbId());
-        location.setLongitude(uploadDto.getLongitude());
-        location.setLatitude(uploadDto.getLatitude());
-        location.setProvince(uploadDto.getProvince());
-        location.setCity(uploadDto.getCity());
-        location.setAddress(uploadDto.getAddress());
-        location.setObservationYear(uploadDto.getObservationYear());
-        location.setCreatedAt(LocalDateTime.now());
-        
-        herbLocationService.save(location); // 保存后，location对象的id字段会被MyBatisPlus自动填充
+    @Transactional
+    public List<HerbImage> saveImagesForLocation(Long locationId, ImageBatchUploadDto uploadDto) {
+        // 1. 验证Location是否存在
+        HerbLocation location = herbLocationService.getById(locationId);
+        if (location == null) {
+            // 在实际应用中，最好抛出一个自定义的业务异常
+            throw new RuntimeException("指定的观测点ID不存在: " + locationId);
+        }
+        Long herbId = location.getHerbId(); // 获取关联的药草ID
 
-        // 第二步：创建并保存HerbImage实体
-        HerbImage image = new HerbImage();
-        image.setHerbId(uploadDto.getHerbId());
-        image.setUrl(uploadDto.getUrl());
-        image.setIsPrimary(uploadDto.getIsPrimary());
-        image.setDescription(uploadDto.getDescription());
-        image.setUploadedAt(LocalDateTime.now());
-        
-        // 关键：使用上一步生成的locationId
-        image.setLocationId(location.getId()); 
+        List<HerbImage> savedImages = new ArrayList<>();
+        for (ImageInfoDto imageInfo : uploadDto.getImages()) {
+            HerbImage image = new HerbImage();
+            BeanUtils.copyProperties(imageInfo, image);
 
-        this.save(image); // 保存图片信息
+            image.setLocationId(locationId);
+            image.setHerbId(herbId); // 关键：设置药草ID
+            image.setUploadedAt(LocalDateTime.now());
 
-        return image;
+            this.save(image);
+            savedImages.add(image);
+        }
+        return savedImages;
     }
 }
