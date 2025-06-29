@@ -50,14 +50,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        // 去掉token额外头
+        final String authToken1 = authToken.substring(7);
+
         try {
             ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
 
-            if (Boolean.FALSE.equals(stringRedisTemplate.hasKey(authToken))) {
+            if (Boolean.FALSE.equals(stringRedisTemplate.hasKey(authToken1))) {
                 throw new Exception("认证失败: Token无效或已下线");
             }
 
-            Map<String, Object> claims = JWTUtil.parseToken(authToken);
+            Map<String, Object> claims = JWTUtil.parseToken(authToken1);
             validateCsrfToken(request, claims, ops);
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
