@@ -2,6 +2,7 @@ package org.csu.service;
 
 import org.csu.domain.HerbImage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.csu.dto.ImageUploadDto;
 
 import java.util.List;
 
@@ -21,4 +22,11 @@ public interface IHerbImageService extends IService<HerbImage> {
      */
     List<String> getImagesByHerbId(Long herbId);
 
+    /**
+     * [核心方法] 保存图片及其关联的地点信息
+     * 这是一个事务性操作
+     * @param uploadDto 包含图片和地点信息的DTO
+     * @return 保存后的图片实体对象
+     */
+    HerbImage saveImageAndLocation(ImageUploadDto uploadDto);
 }

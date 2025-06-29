@@ -1,11 +1,14 @@
 package org.csu.controller;
 
-import org.csu.controller.Result;
+import org.csu.domain.HerbImage;
 import org.csu.dto.HerbDistributionDto;
 import org.csu.dto.HerbGrowthDataDto;
+import org.csu.dto.ImageUploadDto;
+import org.csu.service.IHerbImageService;
 import org.csu.service.IHerbService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -22,6 +25,9 @@ public class HerbController {
 
     @Autowired
     private IHerbService herbService;
+
+    @Autowired
+    private IHerbImageService herbImageService;
 
     /**
      * 获取药材地理分布数据 (用于地图可视化)
@@ -50,7 +56,7 @@ public class HerbController {
      * @return 分页的药材列表
      */
     @GetMapping("/herbs")
-    public Result<?> getHerbs(
+    public Result<String> getHerbs(
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "limit", defaultValue = "10") Integer limit,
             @RequestParam(value = "name", required = false) String name,
@@ -61,7 +67,6 @@ public class HerbController {
             @RequestParam(value = "order", defaultValue = "asc") String order) {
         
         try {
-            // TODO: 实现分页查询逻辑
             return Result.success("药材列表查询功能待实现");
         } catch (Exception e) {
             return Result.error("获取药材列表失败: " + e.getMessage());
@@ -75,9 +80,8 @@ public class HerbController {
      * @return 药材详细信息
      */
     @GetMapping("/herbs/{id}")
-    public Result<?> getHerbById(@PathVariable Long id) {
+    public Result<String> getHerbById(@PathVariable Long id) {
         try {
-            // TODO: 实现获取药材详情逻辑
             return Result.success("药材详情查询功能待实现");
         } catch (Exception e) {
             return Result.error("获取药材详情失败: " + e.getMessage());
@@ -91,9 +95,8 @@ public class HerbController {
      * @return 创建结果
      */
     @PostMapping("/herbs")
-    public Result<?> createHerb(@RequestBody Object herbDto) {
+    public Result<String> createHerb(@RequestBody Object herbDto) {
         try {
-            // TODO: 实现创建药材逻辑
             return Result.success("药材创建功能待实现");
         } catch (Exception e) {
             return Result.error("创建药材失败: " + e.getMessage());
@@ -108,9 +111,8 @@ public class HerbController {
      * @return 更新结果
      */
     @PutMapping("/herbs/{id}")
-    public Result<?> updateHerb(@PathVariable Long id, @RequestBody Object herbDto) {
+    public Result<String> updateHerb(@PathVariable Long id, @RequestBody Object herbDto) {
         try {
-            // TODO: 实现更新药材逻辑
             return Result.success("药材更新功能待实现");
         } catch (Exception e) {
             return Result.error("更新药材失败: " + e.getMessage());
@@ -124,9 +126,8 @@ public class HerbController {
      * @return 删除结果
      */
     @DeleteMapping("/herbs/{id}")
-    public Result<?> deleteHerb(@PathVariable Long id) {
+    public Result<String> deleteHerb(@PathVariable Long id) {
         try {
-            // TODO: 实现删除药材逻辑
             return Result.success("药材删除功能待实现");
         } catch (Exception e) {
             return Result.error("删除药材失败: " + e.getMessage());
@@ -134,18 +135,33 @@ public class HerbController {
     }
 
     /**
-     * 获取指定药材的图片列表 - 用于图谱比对UI
-     * 
+     * 获取指定药材的图片URL列表
      * @param herbId 药材ID
-     * @return 图片列表
+     * @return 图片URL列表
      */
     @GetMapping("/herbs/{herbId}/images")
-    public Result<?> getHerbImages(@PathVariable Long herbId) {
+    public Result<List<String>> getHerbImages(@PathVariable Long herbId) {
         try {
-            // TODO: 实现获取药材图片逻辑
-            return Result.success("药材图片查询功能待实现");
+            List<String> imageUrls = herbImageService.getImagesByHerbId(herbId);
+            return Result.success(imageUrls);
         } catch (Exception e) {
             return Result.error("获取药材图片失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 保存一张新的药材图片及其关联的地点信息
+     * @param uploadDto 包含图片和地点信息的DTO
+     * @return 操作结果
+     */
+    @PostMapping("/herbs/images")
+    public Result<HerbImage> saveImageWithLocation(@Valid @RequestBody ImageUploadDto uploadDto) {
+        try {
+            HerbImage savedImage = herbImageService.saveImageAndLocation(uploadDto);
+            return new Result<>(Code.SUCCESS, savedImage, "图片及地点信息保存成功");
+        } catch (Exception e) {
+            // 注意：如果Service层的事务生效，这里的异常可能是数据库约束等，也可能是其他运行时异常
+            return Result.error(Code.SAVE_ERR, "保存失败: " + e.getMessage());
         }
     }
 
@@ -156,8 +172,8 @@ public class HerbController {
      * @return 该药材在所有观测点的生长数据列表
      */
     @GetMapping("/{herbId}/growth-data")
-    public Result getGrowthDataForHerb(@PathVariable Long herbId) {
+    public Result<List<HerbGrowthDataDto>> getGrowthDataForHerb(@PathVariable Long herbId) {
         List<HerbGrowthDataDto> growthData = herbService.getGrowthDataForHerb(herbId);
-        return new Result(Code.GET_OK, growthData, "查询成功");
+        return new Result<>(Code.GET_OK, growthData, "查询成功");
     }
 }
