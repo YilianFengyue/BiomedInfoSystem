@@ -3,6 +3,7 @@ package org.csu.service;
 import org.csu.domain.Herb;
 import org.csu.dto.HerbDistributionDto;
 import org.csu.dto.HerbGrowthDataDto;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -47,4 +48,18 @@ public interface IHerbService extends IService<Herb> {
      * @return 药材生长数据列表
      */
     List<HerbGrowthDataDto> getGrowthDataForHerb(Long herbId);
+
+    /**
+     * 分页、条件查询和排序获取药材列表
+     * @param page 页码
+     * @param limit 每页数量
+     * @param name 药材名称 (模糊)
+     * @param scientificName 学名 (模糊)
+     * @param familyName 科名 (精确)
+     * @param resourceType 资源类型 (精确)
+     * @param sortBy 排序字段
+     * @param order 排序顺序 ('asc' or 'desc')
+     * @return 分页结果对象
+     */
+    IPage<Herb> getHerbsByPage(Integer page, Integer limit, String name, String scientificName, String familyName, String resourceType, String sortBy, String order);
 }

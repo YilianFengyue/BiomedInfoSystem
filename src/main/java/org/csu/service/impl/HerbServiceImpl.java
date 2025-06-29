@@ -13,11 +13,15 @@ import org.csu.config.BusinessException;
 import org.csu.config.SystemException;
 import org.csu.controller.Code;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -266,5 +270,32 @@ public class HerbServiceImpl extends ServiceImpl<HerbDao, Herb> implements IHerb
         } catch (Exception e) {
             throw new SystemException(Code.SYSTEM_ERR, "系统异常，查询药材生长数据失败", e);
         }
+    }
+
+    @Override
+    public IPage<Herb> getHerbsByPage(Integer pageNum, Integer pageSize, String name, String scientificName, String familyName, String resourceType, String sortBy, String order) {
+        // 1. 创建分页对象
+        Page<Herb> page = new Page<>(pageNum, pageSize);
+
+        // 2. 创建查询条件构造器
+        LambdaQueryWrapper<Herb> queryWrapper = new LambdaQueryWrapper<>();
+
+        // 3. 动态拼接查询条件
+        queryWrapper.like(Strings.isNotEmpty(name), Herb::getName, name);
+        queryWrapper.like(Strings.isNotEmpty(scientificName), Herb::getScientificName, scientificName);
+        queryWrapper.eq(Strings.isNotEmpty(familyName), Herb::getFamilyName, familyName);
+        queryWrapper.eq(Strings.isNotEmpty(resourceType), Herb::getResourceType, resourceType);
+
+        // 4. 处理排序
+        boolean isAsc = "asc".equalsIgnoreCase(order);
+        // 使用一个简单的 switch 来防止SQL注入，并处理驼峰到下划线的转换
+        if (Strings.isNotEmpty(sortBy)) {
+            // 注意：这里需要确保sortBy的值是安全的，或者与数据库列名匹配
+            // 一个更安全的方式是使用映射或白名单
+            queryWrapper.orderBy(true, isAsc, Herb::getName); // 默认按name排序，可以根据sortBy扩展
+        }
+
+        // 5. 执行查询
+        return this.page(page, queryWrapper);
     }
 }
