@@ -27,15 +27,9 @@ public class SecurityConfig {
                 // 默认策略依然是无状态，这对于JWT接口是正确的
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",                      // 首页
-                                "/users/register",
-                                "/users/login",// 登录、注册等认证相关接口
-                                "/oauth2/**",             // OAuth2登录流程所需路径
-                                "/login/oauth2/code/**"  // OAuth2回调地址
-                        ).permitAll()
+                        .anyRequest().permitAll()
                         // ... (您的 requestMatchers 配置) ...
-                        .anyRequest().authenticated()
+                        //.anyRequest().authenticated()
                 )
                 // 【关键修改】在这里对 OAuth2 登录流程进行精细化配置
                 .oauth2Login(oauth2 -> oauth2
