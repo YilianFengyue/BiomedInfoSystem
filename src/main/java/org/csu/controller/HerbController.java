@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import jakarta.validation.Valid;
 import org.csu.domain.Herb;
 import org.csu.domain.HerbImage;
+import org.csu.domain.HerbGrowthData;
 import org.csu.dto.HerbDistributionDto;
 import org.csu.dto.HerbDto;
 import org.csu.dto.HerbGrowthDataDto;
 import org.csu.dto.ImageUploadDto;
 import org.csu.service.IHerbImageService;
 import org.csu.service.IHerbService;
+import org.csu.service.IHerbGrowthDataService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +34,9 @@ public class HerbController {
 
     @Autowired
     private IHerbImageService herbImageService;
+
+    @Autowired
+    private IHerbGrowthDataService growthDataService;
 
     /**
      * 获取药材地理分布数据 (用于地图可视化)
@@ -176,5 +181,25 @@ public class HerbController {
     @GetMapping("/{herbId}/growth-data")
     public Result<List<HerbGrowthDataDto>> getGrowthDataForHerb(@PathVariable Long herbId) {
         return new Result<>(Code.GET_OK, herbService.getGrowthDataForHerb(herbId), "查询成功");
+    }
+
+    /**
+     * 更新药材生长数据，并记录历史
+     * @param id 生长数据的ID
+     * @param dto 包含更新信息的DTO
+     * @return 操作结果
+     */
+    @PutMapping("/growth-data/{id}")
+    public Result<Void> updateGrowthData(@PathVariable Long id, @Valid @RequestBody HerbGrowthDataDto dto) {
+        HerbGrowthData growthData = new HerbGrowthData();
+        // 我们只从DTO中获取需要更新的字段和ID
+        BeanUtils.copyProperties(dto, growthData);
+        growthData.setId(id); // 确保ID是从路径参数中获取的，更安全
+
+        boolean success = growthDataService.updateGrowthDataAndLogHistory(growthData);
+
+        return success
+                ? Result.success()
+                : Result.error(Code.UPDATE_ERR, "更新失败，未找到对应数据或发生内部错误");
     }
 }

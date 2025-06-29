@@ -265,6 +265,30 @@
 *   **方法**: `GET`
 *   **描述**: 获取指定药材所有已保存的图片URL列表。
 
+### **3.4 更新药材生长数据**
+
+*   **Endpoint**: `PUT /api/herb/growth-data/{id}`
+*   **方法**: `PUT`
+*   **描述**: 更新指定ID的药材生长数据，并将旧数据备份到历史表。
+*   **认证**: 需要JWT（用于记录操作人）。
+*   **路径参数**: `{id}` (生长数据记录 `herb_growth_data` 的ID)
+*   **请求体 (Request Body)**: `application/json` (结构基于`HerbGrowthDataDto`)
+    ```json
+    {
+      "metricName": "平均株高",
+      "metricValue": "150.5",
+      "metricUnit": "厘米"
+    }
+    ```
+*   **成功响应 (200 OK)**:
+    ```json
+    { "code": 20000, "data": null, "msg": "操作成功" }
+    ```
+*   **失败响应**:
+    ```json
+    { "code": 20030, "data": null, "msg": "更新失败，未找到对应数据或发生内部错误" }
+    ```
+
 ---
 
 ## **四、 用户与认证模块 (User & Auth)**
@@ -382,7 +406,6 @@
     ```json
     { "code": 20000, "data": null, "msg": "更新头像成功" }
     ```
-
 ### **4.6 修改密码**
 
 *   **Endpoint**: `PATCH /api/users/updatePwd`
@@ -426,3 +449,4 @@
 *   **失败响应**:
     *   `{ "code": 1, "msg": "两次输入的新密码不一致" }`
     *   `{ "code": 1, "msg": "操作失败：您的账户已设置密码，请使用"修改密码"功能。" }`
+
