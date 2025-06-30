@@ -20,7 +20,7 @@ import org.springframework.data.domain.Pageable;
  */
 public interface IEduResourcesService extends IService<EduResources> {
     // 分页查询 (需要连表)
-    Page<ResourceListDto> findPaginated(Integer categoryId, String title, Pageable pageable);
+    //Page<ResourceListDto> findPaginated(Integer categoryId, String title, Pageable pageable);
 
     // 查询详情 (需要连表)
     ResourceDetailDto findById(Long id);
