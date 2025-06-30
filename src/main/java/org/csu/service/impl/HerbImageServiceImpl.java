@@ -73,7 +73,6 @@ public class HerbImageServiceImpl extends ServiceImpl<HerbImageDao, HerbImage> i
             image.setHerbId(herbId); // 关键：设置药草ID
             image.setUploadedAt(LocalDateTime.now());
 
-            System.out.println(image.toString());
             this.save(image);
             savedImages.add(image);
         }
