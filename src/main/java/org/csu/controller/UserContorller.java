@@ -20,6 +20,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -217,5 +218,16 @@ public class UserContorller {
 
         return new Result(UPDATE_OK, null, "密码修改成功，请重新登录");
     }
+
+    /**
+     * 新增接口：获取所有教师列表
+     * @return 包含所有教师详细信息的列表
+     */
+    @GetMapping("/teachers")
+    public Result<List<UserInofDto>> getAllTeachers() {
+        List<UserInofDto> teachers = userService.findTeachersWithProfiles();
+        return Result.success(teachers);
+    }
+
 }
 

@@ -5,17 +5,23 @@ import org.csu.domain.UserProfiles;
 import org.csu.domain.UserThirdPartyAuth;
 import org.csu.domain.Users;
 import org.csu.dao.UsersDao;
+import org.csu.dto.UserInofDto;
 import org.csu.service.IUserProfilesService;
 import org.csu.service.IUserThirdPartyAuthService;
 import org.csu.service.IUsersService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.csu.util.PasswordUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -150,4 +156,44 @@ public class UsersServiceImpl extends ServiceImpl<UsersDao, Users> implements IU
 
         return newUser;
     }
+
+    /**
+     * 新增方法的实现
+     */
+    @Override
+    @Transactional(readOnly = true) // 只读事务，提高查询性能
+    public List<UserInofDto> findTeachersWithProfiles() {
+        // 1. 查询所有角色为教师的用户 (role=2)
+        LambdaQueryWrapper<Users> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Users::getRole, 2);
+        List<Users> teachers = this.list(queryWrapper);
+
+        if (teachers.isEmpty()) {
+            return Collections.emptyList(); // 如果没有教师，直接返回空列表
+        }
+
+        // 2. 提取所有教师的ID
+        List<Long> teacherIds = teachers.stream().map(Users::getId).collect(Collectors.toList());
+
+        // 3. 一次性查询所有教师的个人资料
+        Map<Long, UserProfiles> profilesMap = userProfilesService.listByIds(teacherIds).stream()
+                .collect(Collectors.toMap(UserProfiles::getUserId, Function.identity()));
+
+        // 4. 组装DTO列表
+        return teachers.stream().map(teacher -> {
+            UserInofDto dto = new UserInofDto();
+            // 复制Users表中的基础信息
+            BeanUtils.copyProperties(teacher, dto);
+
+            // 从Map中获取并填充UserProfiles表中的信息
+            UserProfiles profile = profilesMap.get(teacher.getId());
+            if (profile != null) {
+                dto.setNickname(profile.getNickname());
+                dto.setAvatarUrl(profile.getAvatarUrl());
+                dto.setBio(profile.getBio());
+            }
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 }
