@@ -37,7 +37,7 @@ public class Users implements Serializable {
     /**
      * 角色 (e.g., student 1, teacher 2, admin 0 )
      */
-    private Boolean role;
+    private int role;
 
     /**
      * 创建时间

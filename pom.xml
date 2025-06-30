@@ -135,7 +135,7 @@
         </dependency>
 
 
-       </dependencies>
+
         <!-- Baidu AI SDK for Plant Recognition -->
         <dependency>
             <groupId>com.baidu.aip</groupId>
@@ -149,13 +149,6 @@
             </exclusions>
         </dependency>
 
-        <!--
-            此处原有一个无效的依赖项，它缺少 <groupId> 和 <artifactId>，已被移除。
-            <dependency>
-                <version>${mybatis-plus.version}</version>
-                <scope>provided</scope>
-            </dependency>
-        -->
     </dependencies>
 
     <!-- 构建配置 -->
