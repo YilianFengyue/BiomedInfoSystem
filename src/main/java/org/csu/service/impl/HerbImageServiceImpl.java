@@ -63,12 +63,17 @@ public class HerbImageServiceImpl extends ServiceImpl<HerbImageDao, HerbImage> i
         List<HerbImage> savedImages = new ArrayList<>();
         for (ImageInfoDto imageInfo : uploadDto.getImages()) {
             HerbImage image = new HerbImage();
-            BeanUtils.copyProperties(imageInfo, image);
+            //BeanUtils.copyProperties(imageInfo, image);
+            // 【修改建议】手动进行属性赋值
+            image.setUrl(imageInfo.getUrl());
+            image.setDescription(imageInfo.getDescription());
+            image.setIsPrimary(imageInfo.isPrimary()); //  <-- 这是最关键的一行！
 
             image.setLocationId(locationId);
             image.setHerbId(herbId); // 关键：设置药草ID
             image.setUploadedAt(LocalDateTime.now());
 
+            System.out.println(image.toString());
             this.save(image);
             savedImages.add(image);
         }
