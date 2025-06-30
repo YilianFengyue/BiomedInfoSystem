@@ -28,8 +28,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()
-
-                        //.requestMatchers("/api/auth/login", "/api/auth/register").permitAll() ...
+                        // ... (您的 requestMatchers 配置) ...
                         //.anyRequest().authenticated()
                 )
                 // 【关键修改】在这里对 OAuth2 登录流程进行精细化配置

@@ -1,21 +1,11 @@
 package org.csu.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import jakarta.validation.Valid;
-import org.csu.domain.Herb;
-import org.csu.domain.HerbImage;
-import org.csu.domain.HerbGrowthData;
-import org.csu.domain.HerbLocation;
-import org.csu.dto.HerbDistributionDto;
-import org.csu.dto.HerbDto;
-import org.csu.dto.HerbGrowthDataDto;
-import org.csu.dto.ImageBatchUploadDto;
-import org.csu.dto.ImageUploadDto;
-import org.csu.dto.LocationCreateDto;
-import org.csu.service.IHerbImageService;
-import org.csu.service.IHerbLocationService;
-import org.csu.service.IHerbService;
-import org.csu.service.IHerbGrowthDataService;
+import org.csu.domain.*;
+import org.csu.dto.*;
+import org.csu.service.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +35,8 @@ public class HerbController {
     @Autowired
     private IHerbGrowthDataService growthDataService;
 
+    @Autowired
+    private IHerbGrowthDataHistoryService historyService; // 确保注入历史服务
     /**
      * 第一步：创建一个新的观测点
      * @param createDto 包含观测点信息的DTO
@@ -66,6 +58,9 @@ public class HerbController {
     public Result<List<HerbImage>> uploadImagesForLocation(
             @PathVariable Long locationId,
             @Valid @RequestBody ImageBatchUploadDto uploadDto) {
+
+        System.out.println("接收到来自客户端的图片元数据保存请求，内容为:"+uploadDto.toString());
+
         List<HerbImage> savedImages = herbImageService.saveImagesForLocation(locationId, uploadDto);
         return Result.success(savedImages);
     }
@@ -223,4 +218,62 @@ public class HerbController {
                 ? Result.success()
                 : Result.error(Code.UPDATE_ERR, "更新失败，未找到对应数据或发生内部错误");
     }
+
+    /**
+     * 【新增】根据观测点ID获取图片列表
+     * @param locationId 观测点ID
+     * @return 该观测点下的所有图片信息列表
+     */
+    @GetMapping("/locations/{locationId}/images")
+    public Result<List<HerbImage>> getImagesByLocation(@PathVariable Long locationId) {
+        List<HerbImage> images = herbImageService.getImagesByLocationId(locationId);
+        if (images == null || images.isEmpty()) {
+            return Result.error(Code.GET_ERR, "未找到该观测点的图片");
+        }
+        return Result.success(images);
+    }
+
+
+    /**
+     * 【修改】根据观测点ID获取其所有相关的生长数据变更历史
+     * @param locationId 观测点ID
+     * @return 该观测点的所有数据变更历史记录（包含药材名和地址）
+     */
+    @GetMapping("/locations/{locationId}/history")
+    public Result<List<HerbGrowthDataHistoryDto>> getDataHistoryByLocation(@PathVariable Long locationId) {
+        List<HerbGrowthDataHistoryDto> historyList = growthDataService.getHistoryByLocationId(locationId);
+        if (historyList == null) {
+            return Result.success(java.util.Collections.emptyList());
+        }
+        return Result.success(historyList);
+    }
+
+    /**
+     * 【新增】获取所有生长数据变更历史，并支持模糊查询
+     * @param query 可选的查询参数，用于搜索指标名称或备注
+     * @return 历史记录列表
+     */
+    @GetMapping("/history/all")
+    public Result<List<HerbGrowthDataHistoryDto>> getAllDataHistory(
+            @RequestParam(required = false) String query) {
+
+        QueryWrapper<HerbGrowthDataHistory> queryWrapper = new QueryWrapper<>();
+        if (query != null && !query.isEmpty()) {
+            queryWrapper.like("metric_name", query)
+                    .or()
+                    .like("changed_by", query)
+                    .or()
+                    .like("remark", query)
+                    .or()
+                    .like("herb_name", query) // 假设DTO中有此字段
+                    .or()
+                    .like("address", query);  // 假设DTO中有此字段
+        }
+        queryWrapper.orderByDesc("changed_at"); // 默认按时间降序
+
+        // 注意：这里需要调用能返回增强版DTO的服务方法
+        List<HerbGrowthDataHistoryDto> historyList = growthDataService.getAllHistoryWithDetails(queryWrapper);
+        return Result.success(historyList);
+    }
+
 }
