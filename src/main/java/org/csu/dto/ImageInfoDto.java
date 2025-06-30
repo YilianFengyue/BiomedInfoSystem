@@ -1,5 +1,6 @@
 package org.csu.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
@@ -14,7 +15,8 @@ public class ImageInfoDto {
     @URL(message = "必须是有效的URL格式")
     private String url;
 
-    private boolean isPrimary = false;
+    @JsonProperty("Primary")
+    private boolean Primary;
 
     private String description;
 } 
