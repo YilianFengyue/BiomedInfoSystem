@@ -5,6 +5,7 @@ import org.csu.domain.UserProfiles;
 import org.csu.domain.Users;
 import org.csu.dto.SetPasswordDto;
 import org.csu.dto.UpdatePasswordDto;
+import org.csu.dto.UserInofDto;
 import org.csu.service.AuthenticationHelperService;
 import org.csu.service.IUserProfilesService;
 import org.csu.service.IUsersService;
@@ -92,13 +93,34 @@ public class UserContorller {
 
     @GetMapping("/userInfo")
     public Result userinfo() {
-
-        Map<String,Object> threadLocal = ThreadLocalUtil.getThreadLocal();
+        // 从线程上下文中获取当前用户ID
+        Map<String, Object> threadLocal = ThreadLocalUtil.getThreadLocal();
         int id = (int) threadLocal.get("id");
+
+        // 1. 查询用户基本信息（假设通过用户ID能获取到User对象）
+        Users user = userService.getById(id);
+        if (user == null) {
+            return new Result(GET_ERR, null, "用户不存在");
+        }
+
+        // 2. 查询用户资料信息
         UserProfiles userProfiles = userProfilesService.getById(id);
+        if (userProfiles == null) {
+            // 根据业务需求决定是否返回错误或只返回用户基本信息
+            return new Result(GET_ERR, null, "用户资料不存在");
+        }
 
-        return new Result(GET_OK,userProfiles,"获取成功");
+        // 3. 构建并填充DTO
+        UserInofDto dto = new UserInofDto();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setRole(user.getRole());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setNickname(userProfiles.getNickname());
+        dto.setAvatarUrl(userProfiles.getAvatarUrl());
+        dto.setBio(userProfiles.getBio());
 
+        return new Result(GET_OK, dto, "获取成功");
     }
 
     @PutMapping("/update")
