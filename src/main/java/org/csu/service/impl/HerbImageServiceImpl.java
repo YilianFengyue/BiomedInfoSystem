@@ -1,6 +1,7 @@
 package org.csu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.csu.dao.HerbImageDao;
 import org.csu.domain.HerbImage;
@@ -78,5 +79,12 @@ public class HerbImageServiceImpl extends ServiceImpl<HerbImageDao, HerbImage> i
             savedImages.add(image);
         }
         return savedImages;
+    }
+
+    @Override
+    public List<HerbImage> getImagesByLocationId(Long locationId) {
+        QueryWrapper<HerbImage> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("location_id", locationId);
+        return list(queryWrapper);
     }
 }
