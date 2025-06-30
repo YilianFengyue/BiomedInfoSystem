@@ -1,11 +1,17 @@
 package org.csu.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.csu.dao.HerbGrowthDataHistoryDao;
+import org.csu.domain.Herb;
 import org.csu.domain.HerbGrowthData;
 import org.csu.dao.HerbGrowthDataDao;
 import org.csu.domain.HerbGrowthDataHistory;
+import org.csu.domain.HerbLocation;
+import org.csu.dto.HerbGrowthDataHistoryDto;
 import org.csu.service.IHerbGrowthDataService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.csu.service.IHerbLocationService;
+import org.csu.service.IHerbService;
 import org.csu.util.ThreadLocalUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -28,6 +37,15 @@ public class HerbGrowthDataServiceImpl extends ServiceImpl<HerbGrowthDataDao, He
 
     @Autowired
     private HerbGrowthDataHistoryDao historyDao;
+
+    @Autowired
+    private HerbGrowthDataHistoryDao historyMapper;
+
+    @Autowired
+    private IHerbLocationService locationService; // 注入Location服务
+
+    @Autowired
+    private IHerbService herbService; // 注入Herb服务
 
     @Override
     @Transactional
@@ -68,4 +86,74 @@ public class HerbGrowthDataServiceImpl extends ServiceImpl<HerbGrowthDataDao, He
 
         return this.updateById(oldGrowthData);
     }
+
+    /**
+     * 【修改】实现数据聚合逻辑
+     */
+    @Override
+    public List<HerbGrowthDataHistoryDto> getHistoryByLocationId(Long locationId) {
+
+        // 1. 获取基础历史数据
+        QueryWrapper<HerbGrowthDataHistory> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("location_id", locationId).orderByDesc("changed_at");
+        List<HerbGrowthDataHistory> histories = historyMapper.selectList(queryWrapper);
+
+        if (histories.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+
+        // 2. 获取关联的地点和药材信息
+        HerbLocation location = locationService.getById(locationId);
+        if (location == null) {
+            return java.util.Collections.emptyList(); // 如果地点不存在，直接返回
+        }
+        Herb herb = herbService.getById(location.getHerbId());
+
+        // 3. 组装DTO列表
+        return histories.stream().map(history -> {
+            HerbGrowthDataHistoryDto dto = new HerbGrowthDataHistoryDto();
+            BeanUtils.copyProperties(history, dto); // 复制基础属性
+            if (herb != null) {
+                dto.setHerbName(herb.getName()); // 设置药材名
+            }
+            dto.setAddress(location.getAddress()); // 设置地址
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<HerbGrowthDataHistoryDto> getAllHistoryWithDetails(QueryWrapper<HerbGrowthDataHistory> queryWrapper) {
+        // 1. 根据传入的条件查询基础历史数据
+        List<HerbGrowthDataHistory> histories = historyMapper.selectList(queryWrapper);
+
+        if (histories.isEmpty()) {
+            return java.util.Collections.emptyList();
+        }
+
+        // 2. 批量获取所有涉及的 locationIds 和 herbIds
+        List<Long> locationIds = histories.stream().map(HerbGrowthDataHistory::getLocationId).distinct().collect(Collectors.toList());
+        List<HerbLocation> locations = locationService.listByIds(locationIds);
+        Map<Long, HerbLocation> locationMap = locations.stream().collect(Collectors.toMap(HerbLocation::getId, Function.identity()));
+
+        List<Long> herbIds = locations.stream().map(HerbLocation::getHerbId).distinct().collect(Collectors.toList());
+        Map<Long, Herb> herbMap = herbService.listByIds(herbIds).stream().collect(Collectors.toMap(Herb::getId, Function.identity()));
+
+
+        // 3. 组装最终的DTO列表
+        return histories.stream().map(history -> {
+            HerbGrowthDataHistoryDto dto = new HerbGrowthDataHistoryDto();
+            BeanUtils.copyProperties(history, dto); // 复制基础属性
+
+            HerbLocation location = locationMap.get(history.getLocationId());
+            if (location != null) {
+                dto.setAddress(location.getAddress()); // 设置地址
+                Herb herb = herbMap.get(location.getHerbId());
+                if (herb != null) {
+                    dto.setHerbName(herb.getName()); // 设置药材名
+                }
+            }
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
 }

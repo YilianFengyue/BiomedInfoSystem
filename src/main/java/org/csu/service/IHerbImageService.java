@@ -29,4 +29,12 @@ public interface IHerbImageService extends IService<HerbImage> {
      * @return 保存后的图片实体对象列表
      */
     List<HerbImage> saveImagesForLocation(Long locationId, ImageBatchUploadDto uploadDto);
+
+
+    /**
+     * 根据观测点ID获取图片列表
+     * @param locationId 观测点ID
+     * @return 图片列表
+     */
+    List<HerbImage> getImagesByLocationId(Long locationId);
 }
