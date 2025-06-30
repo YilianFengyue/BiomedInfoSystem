@@ -75,6 +75,7 @@ public class UserContorller {
         public Result login(@RequestBody Users user) {
             Users loginUser = userService.findByUserName(user.getUsername());
 
+
             if (loginUser == null) {
                 return new Result(LOGIN_ERR,null,"用户名错误");
             }
@@ -83,6 +84,7 @@ public class UserContorller {
                 return new Result(LOGIN_ERR,null,"密码错误");
             } else {
                 Map<String, String> responseData = authHelperService.handleLoginSuccess(loginUser);
+                responseData.put("role", String.valueOf(loginUser.getRole()));
                 return new Result(LOGIN_OK,responseData,"登录成功");
             }
         }
