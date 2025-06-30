@@ -33,6 +33,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         Users localUser = usersService.findOrCreateUserByThirdParty(provider, providerUserId, attributes);
 
         Map<String, String> responseData = authHelperService.handleLoginSuccess(localUser);
+        responseData.put("role", String.valueOf(localUser.getRole()));
 
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(responseData));
