@@ -45,41 +45,41 @@ public class EduResourceServiceImpl extends ServiceImpl<EduResourcesDao, EduReso
         this.usersDao = usersDao;
     }
 
-//    @Override
-//    @Transactional(readOnly = true)
-//    public org.springframework.data.domain.Page<ResourceListDto> findPaginated(Integer categoryId, String title, Pageable pageable) {
-//
-//        LambdaQueryWrapper<EduResources> queryWrapper = new LambdaQueryWrapper<>();
-//        queryWrapper.eq(categoryId != null, EduResources::getCategoryId, categoryId);
-//        queryWrapper.like(title != null && !title.isBlank(), EduResources::getTitle, title);
-//        queryWrapper.orderByDesc(EduResources::getCreatedAt);
-//
-//        com.baomidou.mybatisplus.extension.plugins.pagination.Page<EduResources> mpPage = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageable.getPageNumber() + 1, pageable.getPageSize());
-//        baseMapper.selectPage(mpPage, queryWrapper);
-//
-//        List<EduResources> resources = mpPage.getRecords();
-//        if (CollectionUtils.isEmpty(resources)) {
-//            return new PageImpl<>(Collections.emptyList(), pageable, 0);
-//        }
-//
-//        List<Integer> categoryIds = resources.stream().map(EduResources::getCategoryId).distinct().collect(Collectors.toList());
-//        List<Long> authorIds = resources.stream().map(EduResources::getAuthorId).distinct().collect(Collectors.toList());
-//
-//        Map<Integer, String> categoryMap = categoryDao.selectBatchIds(categoryIds).stream()
-//                .collect(Collectors.toMap(EduCategories::getId, EduCategories::getName));
-//        Map<Long, String> authorMap = usersDao.selectBatchIds(authorIds).stream()
-//                .collect(Collectors.toMap(Users::getId, Users::getUsername));
-//
-//        List<ResourceListDto> dtoList = resources.stream().map(resource -> {
-//            ResourceListDto dto = new ResourceListDto();
-//            BeanUtils.copyProperties(resource, dto);
-//            dto.setCategoryName(categoryMap.get(resource.getCategoryId()));
-//            dto.setAuthorName(authorMap.get(resource.getAuthorId()));
-//            return dto;
-//        }).collect(Collectors.toList());
-//
-//        return new PageImpl<>(dtoList, pageable, mpPage.getTotal());
-//    }
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<ResourceListDto> findPaginated(Integer categoryId, String title, Pageable pageable) {
+
+        LambdaQueryWrapper<EduResources> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(categoryId != null, EduResources::getCategoryId, categoryId);
+        queryWrapper.like(title != null && !title.isBlank(), EduResources::getTitle, title);
+        queryWrapper.orderByDesc(EduResources::getCreatedAt);
+
+        com.baomidou.mybatisplus.extension.plugins.pagination.Page<EduResources> mpPage = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageable.getPageNumber() + 1, pageable.getPageSize());
+        baseMapper.selectPage(mpPage, queryWrapper);
+
+        List<EduResources> resources = mpPage.getRecords();
+        if (CollectionUtils.isEmpty(resources)) {
+            return new PageImpl<>(Collections.emptyList(), pageable, 0);
+        }
+
+        List<Integer> categoryIds = resources.stream().map(EduResources::getCategoryId).distinct().collect(Collectors.toList());
+        List<Long> authorIds = resources.stream().map(EduResources::getAuthorId).distinct().collect(Collectors.toList());
+
+        Map<Integer, String> categoryMap = categoryDao.selectBatchIds(categoryIds).stream()
+                .collect(Collectors.toMap(EduCategories::getId, EduCategories::getName));
+        Map<Long, String> authorMap = usersDao.selectBatchIds(authorIds).stream()
+                .collect(Collectors.toMap(Users::getId, Users::getUsername));
+
+        List<ResourceListDto> dtoList = resources.stream().map(resource -> {
+            ResourceListDto dto = new ResourceListDto();
+            BeanUtils.copyProperties(resource, dto);
+            dto.setCategoryName(categoryMap.get(resource.getCategoryId()));
+            dto.setAuthorName(authorMap.get(resource.getAuthorId()));
+            return dto;
+        }).collect(Collectors.toList());
+
+        return new PageImpl<>(dtoList, pageable, mpPage.getTotal());
+    }
 
     @Override
     @Transactional(readOnly = true)
