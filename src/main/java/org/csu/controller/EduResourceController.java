@@ -35,7 +35,8 @@ public class EduResourceController {
             @Parameter(description = "标题关键字") @RequestParam(required = false) String title,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        return Result.success(resourceService.findPaginated(categoryId, title, pageable));
+        // return Result.success(resourceService.findPaginated(categoryId, title, pageable));
+        return Result.success();
     }
 
     @GetMapping("/{id}")
