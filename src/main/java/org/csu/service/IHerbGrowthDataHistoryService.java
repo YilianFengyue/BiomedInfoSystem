@@ -12,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2025-06-28
  */
 public interface IHerbGrowthDataHistoryService extends IService<HerbGrowthDataHistory> {
-
+    
 }

@@ -44,9 +44,8 @@ public interface IEduVideosService extends IService<EduVideos> {
      * @param id 要删除的视频ID
      */
     void delete(Long id);
-<<<<<<< HEAD
-=======
+
 
     VideoDto findById(Long id);
->>>>>>> b104f3478a51b5fac74029ce5bc1267e2bb2b6b0
+
 }
