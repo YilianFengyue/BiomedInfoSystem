@@ -2,14 +2,18 @@ package org.csu.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.csu.dto.PageDto;
-import org.csu.dto.VideoDto;
+import jakarta.validation.Valid;
+import org.csu.dto.*;
 import org.csu.service.IEduVideosService;
+import org.csu.service.IVideoInteractionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/videos")
@@ -19,7 +23,9 @@ public class EduVideoController {
     @Autowired
     private IEduVideosService videoService;
 
-    // ... (create, update, delete methods remain the same) ...
+    @Autowired
+    private IVideoInteractionService videoInteractionService;
+
 
     @PostMapping
     @Operation(summary = "新增视频记录", description = "视频上传成功后，调用此接口将视频信息存入数据库")
@@ -38,18 +44,9 @@ public class EduVideoController {
         return Result.success(new PageDto<>(videoPage));
     }
 
-    /**
-     * 【新增的接口】
-     * 根据ID获取单个视频的详细信息。
-     * This method handles GET requests to /api/videos/{id}
-     *
-     * @param id The ID of the video, extracted from the path.
-     * @return A Result object containing the detailed video DTO.
-     */
     @GetMapping("/{id}")
     @Operation(summary = "获取单个视频详情")
     public Result<VideoDto> getVideoById(@PathVariable Long id) {
-        // We assume you have already created the findById method in IEduVideosService and its implementation
         VideoDto videoDto = videoService.findById(id);
         return Result.success(videoDto);
     }
@@ -65,5 +62,33 @@ public class EduVideoController {
     public Result<Void> deleteVideo(@PathVariable Long id) {
         videoService.delete(id);
         return Result.success();
+    }
+
+    // --- 新增接口 ---
+
+    @GetMapping("/{id}/likes")
+    @Operation(summary = "获取视频的点赞信息")
+    public Result<LikeDto> getLikeInfo(@PathVariable Long id, @RequestParam Long userId) {
+        return Result.success(videoInteractionService.getLikeInfo(id, userId));
+    }
+
+    @PostMapping("/{id}/like")
+    @Operation(summary = "点赞或取消点赞视频")
+    public Result<LikeDto> toggleLike(@PathVariable Long id, @RequestBody Map<String, Long> payload) {
+        // 【关键修改】调用修改后的service方法，并将其返回的最新状态作为成功响应的数据
+        LikeDto newLikeState = videoInteractionService.toggleLike(id, payload.get("userId"));
+        return Result.success(newLikeState, "操作成功");
+    }
+
+    @GetMapping("/{id}/comments")
+    @Operation(summary = "获取视频的留言列表")
+    public Result<List<CommentDto>> getComments(@PathVariable Long id) {
+        return Result.success(videoInteractionService.getComments(id));
+    }
+
+    @PostMapping("/{id}/comments")
+    @Operation(summary = "为视频发表留言")
+    public Result<CommentDto> postComment(@PathVariable Long id, @Valid @RequestBody CommentCreateDto commentCreateDto) {
+        return Result.success(videoInteractionService.postComment(id, commentCreateDto));
     }
 }
