@@ -2,10 +2,12 @@ package org.csu.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.csu.dto.PageDto;
 import org.csu.dto.VideoDto;
 import org.csu.service.IEduVideosService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,17 +23,41 @@ public class EduVideoController {
 
     // 注意：视频文件上传通常是一个独立的上传接口，这里只管理视频的元数据
 
+    // ... (create, update, delete methods remain the same) ...
+
+
     @PostMapping
     @Operation(summary = "新增视频记录", description = "视频上传成功后，调用此接口将视频信息存入数据库")
     public Result<VideoDto> createVideoMetadata(@RequestBody VideoDto videoDTO) {
-        // uploader_id 应从当前登录用户获取
+
         return Result.success(videoService.create(videoDTO));
     }
 
-    @GetMapping
+    @GetMapping("/page")
     @Operation(summary = "分页查询视频库列表")
-    public Result<Page<VideoDto>> getVideos(Pageable pageable) {
-        return Result.success(videoService.findPaginated(pageable));
+    public Result<PageDto<VideoDto>> getVideos(
+            @RequestParam(defaultValue = "1") Integer pageNum,
+            @RequestParam(defaultValue = "10") Integer pageSize) {
+
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
+        Page<VideoDto> videoPage = videoService.findPaginated(pageable);
+        return Result.success(new PageDto<>(videoPage));
+    }
+
+    /**
+     * 【新增的接口】
+     * 根据ID获取单个视频的详细信息。
+     * This method handles GET requests to /api/videos/{id}
+     *
+     * @param id The ID of the video, extracted from the path.
+     * @return A Result object containing the detailed video DTO.
+     */
+    @GetMapping("/{id}")
+    @Operation(summary = "获取单个视频详情")
+    public Result<VideoDto> getVideoById(@PathVariable Long id) {
+        // We assume you have already created the findById method in IEduVideosService and its implementation
+        VideoDto videoDto = videoService.findById(id);
+        return Result.success(videoDto);
     }
 
     @PutMapping("/{id}")
@@ -43,7 +69,7 @@ public class EduVideoController {
     @DeleteMapping("/{id}")
     @Operation(summary = "从视频库删除视频记录")
     public Result<Void> deleteVideo(@PathVariable Long id) {
-        // 注意：这里通常只删除数据库记录，OSS上的物理文件可能需要异步任务去清理
+
         videoService.delete(id);
         return Result.success();
     }
