@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.csu.dao.VideoLikesDao">
+    <select id="countByVideoIds" resultType="java.lang.Integer">
+        <if test="videoIds != null and videoIds.size() > 0">
+            SELECT count(*) FROM video_likes
+            WHERE video_id IN
+            <foreach item="item" collection="videoIds" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="videoIds == null or videoIds.size() == 0">
+            SELECT 0
+        </if>
+    </select>
+</mapper> 
