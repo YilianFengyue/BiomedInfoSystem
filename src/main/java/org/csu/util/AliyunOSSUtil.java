@@ -8,15 +8,17 @@ import com.aliyun.oss.model.PolicyConditions;
 import org.csu.config.AliyunOSSConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile; // 【修正】 引入MultipartFile类
 
+import java.io.InputStream; // 【修正】 引入InputStream类
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.UUID; // 【修正】 引入UUID类
 
 /**
  * 阿里云OSS工具类
- * 主要用于生成前端直传所需要的Policy和签名
  */
 @Component
 public class AliyunOSSUtil {
@@ -27,25 +29,16 @@ public class AliyunOSSUtil {
     @Autowired
     private OSS ossClient;
 
-    /**
-     * 生成前端上传所需的Policy和签名等信息
-     * @return 包含policy、signature等信息的Map
-     */
     public Map<String, String> getPolicy() {
-        // host的格式为 bucketname.endpoint
         String host = "https://" + aliyunOSSConfig.getBucketName() + "." + aliyunOSSConfig.getEndpoint();
-        // callbackUrl为上传回调服务器的URL，请根据实际情况设置
-        // String callbackUrl = "http://88.88.88.88:8888"; 
-        String dir = "user-uploads/"; // 设置上传到OSS的哪个文件夹
+        String dir = "user-uploads/";
 
-        long expireTime = 300; // 签名有效期300秒
+        long expireTime = 300;
         long expireEndTime = System.currentTimeMillis() + expireTime * 1000;
         Date expiration = new Date(expireEndTime);
-        
+
         PolicyConditions policyConds = new PolicyConditions();
-        // 设置上传文件的大小限制，例如1GB
         policyConds.addConditionItem(PolicyConditions.COND_CONTENT_LENGTH_RANGE, 0, 1048576000);
-        // 设置上传目录
         policyConds.addConditionItem(MatchMode.StartWith, PolicyConditions.COND_KEY, dir);
 
         String postPolicy = ossClient.generatePostPolicy(expiration, policyConds);
@@ -60,8 +53,32 @@ public class AliyunOSSUtil {
         respMap.put("dir", dir);
         respMap.put("host", host);
         respMap.put("expire", String.valueOf(expireEndTime / 1000));
-        // respMap.put("callback", "your_callback_data"); // 如果需要回调，则添加此项
 
         return respMap;
+    }
+
+    /**
+     * 新增：通用文件上传方法
+     * @param file 从前端接收的文件
+     * @return 上传成功后文件的公共访问URL
+     */
+    public String uploadFile(MultipartFile file) {
+        String originalFilename = file.getOriginalFilename();
+        // 使用UUID确保文件名唯一，避免覆盖
+        String fileName = "user-uploads/" + UUID.randomUUID().toString() + "_" + originalFilename;
+
+        try {
+            InputStream inputStream = file.getInputStream();
+            // 上传文件到指定的Bucket和文件名
+            ossClient.putObject(aliyunOSSConfig.getBucketName(), fileName, inputStream);
+
+            // 拼接并返回文件的公网访问URL
+            return "https://" + aliyunOSSConfig.getBucketName() + "." + aliyunOSSConfig.getEndpoint() + "/" + fileName;
+
+        } catch (Exception e) {
+            // 在实际应用中，建议使用日志框架记录错误
+            e.printStackTrace();
+            throw new RuntimeException("文件上传到OSS时发生错误", e);
+        }
     }
 }

@@ -1,8 +1,7 @@
-package org.csu.service;
+package org.csu.util;
 
 import lombok.RequiredArgsConstructor;
 import org.csu.domain.Users;
-import org.csu.util.JWTUtil;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -13,8 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationHelperService {
-
+public class AuthenticationHelperUtil {
     private final StringRedisTemplate stringRedisTemplate;
 
     private static final String JWT_PREFIX = "Bearer ";

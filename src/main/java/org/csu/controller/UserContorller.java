@@ -6,20 +6,17 @@ import org.csu.domain.Users;
 import org.csu.dto.SetPasswordDto;
 import org.csu.dto.UpdatePasswordDto;
 import org.csu.dto.UserInofDto;
-import org.csu.service.AuthenticationHelperService;
 import org.csu.service.IUserProfilesService;
 import org.csu.service.IUsersService;
-import org.csu.util.JWTUtil;
+import org.csu.util.AuthenticationHelperUtil;
 import org.csu.util.PasswordUtil;
 import org.csu.util.ThreadLocalUtil;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +38,7 @@ public class UserContorller {
     private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
-    private AuthenticationHelperService authHelperService;
+    private AuthenticationHelperUtil authHelperUtil;
 
     @PostMapping("/register")
     public Result register(@RequestBody Users user) {
@@ -84,7 +81,7 @@ public class UserContorller {
             if (!PasswordUtil.checkPassword(user.getPasswordHash(), loginUser.getPasswordHash())) {
                 return new Result(LOGIN_ERR,null,"密码错误");
             } else {
-                Map<String, String> responseData = authHelperService.handleLoginSuccess(loginUser);
+                Map<String, String> responseData = authHelperUtil.handleLoginSuccess(loginUser);
                 return new Result(LOGIN_OK,responseData,"登录成功");
             }
         }

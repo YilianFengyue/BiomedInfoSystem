@@ -52,4 +52,14 @@ public class Result<T> {
     public static <T> Result<T> error(Integer code, String message) {
         return new Result<>(code, null, message);
     }
+
+    /**
+     * 【新增】成功响应（带自定义消息）
+     * @param data 返回的数据
+     * @param msg  自定义的成功消息
+     */
+    public static <T> Result<T> success(T data, String msg) {
+        return new Result<>(Code.SUCCESS, data, msg);
+    }
+
 }

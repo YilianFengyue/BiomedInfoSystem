@@ -5,8 +5,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.csu.domain.Users;
-import org.csu.service.AuthenticationHelperService;
 import org.csu.service.IUsersService;
+import org.csu.util.AuthenticationHelperUtil;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -20,7 +20,7 @@ import java.util.Map;
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final IUsersService usersService;
-    private final AuthenticationHelperService authHelperService;
+    private final AuthenticationHelperUtil authHelperUtil;
     private final ObjectMapper objectMapper;
 
     @Override
@@ -32,7 +32,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         Users localUser = usersService.findOrCreateUserByThirdParty(provider, providerUserId, attributes);
 
-        Map<String, String> responseData = authHelperService.handleLoginSuccess(localUser);
+        Map<String, String> responseData = authHelperUtil.handleLoginSuccess(localUser);
 
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().write(objectMapper.writeValueAsString(responseData));
