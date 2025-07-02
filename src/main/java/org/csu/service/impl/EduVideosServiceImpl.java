@@ -8,7 +8,7 @@ import org.csu.config.BusinessException;
 import org.csu.controller.Code;
 import org.csu.dao.EduVideosDao;
 import org.csu.domain.EduVideos;
-<<<<<<< HEAD
+
 import org.csu.dto.VideoDto;
 import org.csu.service.IEduVideosService;
 import org.springframework.beans.BeanUtils;
