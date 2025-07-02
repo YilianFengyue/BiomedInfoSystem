@@ -6,6 +6,7 @@ import org.csu.domain.Users;
 import org.csu.dto.SetPasswordDto;
 import org.csu.dto.UpdatePasswordDto;
 import org.csu.dto.UserInofDto;
+import org.csu.dto.UserResourceDto;
 import org.csu.service.IUserProfilesService;
 import org.csu.service.IUsersService;
 import org.csu.util.AuthenticationHelperUtil;
@@ -224,6 +225,17 @@ public class UserContorller {
     public Result<List<UserInofDto>> getAllTeachers() {
         List<UserInofDto> teachers = userService.findTeachersWithProfiles();
         return Result.success(teachers);
+    }
+
+    /**
+     * 新增：根据用户ID获取其上传的所有资源
+     * @param id 用户ID
+     * @return 包含图文和视频的资源列表
+     */
+    @GetMapping("/{id}/resources")
+    public Result<List<UserResourceDto>> getUserResources(@PathVariable Long id) {
+        List<UserResourceDto> resources = userService.findResourcesByUserId(id);
+        return Result.success(resources);
     }
 
 }

@@ -1,11 +1,13 @@
 package org.csu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import org.csu.domain.UserProfiles;
-import org.csu.domain.UserThirdPartyAuth;
-import org.csu.domain.Users;
+import org.csu.dao.EduCategoriesDao;
+import org.csu.dao.EduResourcesDao;
+import org.csu.dao.EduVideosDao;
+import org.csu.domain.*;
 import org.csu.dao.UsersDao;
 import org.csu.dto.UserInofDto;
+import org.csu.dto.UserResourceDto;
 import org.csu.service.IUserProfilesService;
 import org.csu.service.IUserThirdPartyAuthService;
 import org.csu.service.IUsersService;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +42,15 @@ public class UsersServiceImpl extends ServiceImpl<UsersDao, Users> implements IU
 
     @Autowired
     private IUserThirdPartyAuthService thirdPartyAuthService;
+
+    @Autowired
+    private EduResourcesDao eduResourcesDao;
+
+    @Autowired
+    private EduVideosDao eduVideosDao;
+
+    @Autowired
+    private EduCategoriesDao eduCategoriesDao;
 
 
     @Override
@@ -196,4 +208,63 @@ public class UsersServiceImpl extends ServiceImpl<UsersDao, Users> implements IU
         }).collect(Collectors.toList());
     }
 
+
+    @Override
+    public List<UserResourceDto> findResourcesByUserId(Long userId) {
+        List<UserResourceDto> combinedResources = new ArrayList<>();
+
+        // 1. 查询图文资源
+        LambdaQueryWrapper<EduResources> resourcesQuery = new LambdaQueryWrapper<>();
+        resourcesQuery.eq(EduResources::getAuthorId, userId);
+        List<EduResources> textResources = eduResourcesDao.selectList(resourcesQuery);
+
+        // 如果有图文资源，处理并添加到列表
+        if (textResources != null && !textResources.isEmpty()) {
+            // 批量获取分类信息以优化性能
+            List<Integer> categoryIds = textResources.stream()
+                    .map(EduResources::getCategoryId)
+                    .distinct()
+                    .collect(Collectors.toList());
+            Map<Integer, String> categoryMap = eduCategoriesDao.selectBatchIds(categoryIds).stream()
+                    .collect(Collectors.toMap(EduCategories::getId, EduCategories::getName));
+
+            List<UserResourceDto> textDtos = textResources.stream().map(res -> {
+                UserResourceDto dto = new UserResourceDto();
+                dto.setId(res.getId());
+                dto.setTitle(res.getTitle());
+                dto.setResourceType("text");
+                dto.setCoverImageUrl(res.getCoverImageUrl());
+                dto.setCreatedAt(res.getCreatedAt());
+                dto.setCategoryName(categoryMap.get(res.getCategoryId()));
+                return dto;
+            }).collect(Collectors.toList());
+            combinedResources.addAll(textDtos);
+        }
+
+
+        // 2. 查询视频资源
+        LambdaQueryWrapper<EduVideos> videosQuery = new LambdaQueryWrapper<>();
+        videosQuery.eq(EduVideos::getUploaderId, userId);
+        List<EduVideos> videoResources = eduVideosDao.selectList(videosQuery);
+
+        if (videoResources != null && !videoResources.isEmpty()) {
+            List<UserResourceDto> videoDtos = videoResources.stream().map(vid -> {
+                UserResourceDto dto = new UserResourceDto();
+                dto.setId(vid.getId());
+                dto.setTitle(vid.getTitle());
+                dto.setResourceType("video");
+                dto.setCoverImageUrl(vid.getCoverUrl());
+                dto.setCreatedAt(vid.getCreatedAt());
+                dto.setDuration(vid.getDuration());
+                dto.setVideoUrl(vid.getVideoUrl());
+                return dto;
+            }).collect(Collectors.toList());
+            combinedResources.addAll(videoDtos);
+        }
+
+        // 3. 按创建时间降序排序
+        combinedResources.sort((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()));
+
+        return combinedResources;
+    }
 }
