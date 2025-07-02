@@ -75,6 +75,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jdbc</artifactId>
+        </dependency>
+
+
         <!-- MySQL 数据库驱动 -->
         <dependency>
             <groupId>com.mysql</groupId>
