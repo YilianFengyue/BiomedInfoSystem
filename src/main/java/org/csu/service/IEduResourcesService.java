@@ -19,8 +19,10 @@ import org.springframework.data.domain.Pageable;
  * @since 2025-06-28
  */
 public interface IEduResourcesService extends IService<EduResources> {
-    // 分页查询 (需要连表)
-    org.springframework.data.domain.Page<ResourceListDto> findPaginated(Integer categoryId, String title, Pageable pageable);
+    /**
+     * 【修改】分页查询，增加status筛选
+     */
+    org.springframework.data.domain.Page<ResourceListDto> findPaginated(Integer categoryId, String title, String status, Pageable pageable);
 
     // 查询详情 (需要连表)
     ResourceDetailDto findById(Long id);
@@ -48,4 +50,10 @@ public interface IEduResourcesService extends IService<EduResources> {
     IPage<EduResourcesDto> getResourcesWithAuthorByPage(Page<EduResourcesDto> page);
 
 
+    /**
+     * 更新单个资源的状态
+     * @param id 资源ID
+     * @param status 新的状态
+     */
+    void updateStatus(Long id, String status);
 }

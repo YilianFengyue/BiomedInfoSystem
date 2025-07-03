@@ -1,4 +1,4 @@
-// src/main/java/org/csu/controller/EduUploadController.java
+// 文件路径: src/main/java/org/csu/controller/EduUploadController.java
 package org.csu.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,7 +40,11 @@ public class EduUploadController {
             EduResources resource = new EduResources();
             BeanUtils.copyProperties(uploadDto, resource);
             resource.setCreatedAt(LocalDateTime.now());
-            resource.setPublishedAt( "published".equals(uploadDto.getStatus()) ? LocalDateTime.now() : null);
+
+            // 【关键修改】强制将新上传的图文资源状态设置为 'draft'
+            resource.setStatus("draft");
+            // 草稿状态下，发布时间应为null
+            resource.setPublishedAt(null);
 
             resourcesService.save(resource);
             return Result.success(resource);
@@ -50,12 +54,13 @@ public class EduUploadController {
             EduVideos video = new EduVideos();
             BeanUtils.copyProperties(uploadDto, video);
 
-            // 【关键修正】手动将DTO中的coverImageUrl设置到video实体的coverUrl字段
             video.setCoverUrl(uploadDto.getCoverImageUrl());
-
             video.setDescription(uploadDto.getDescription());
             video.setUploaderId(uploadDto.getAuthorId());
             video.setCreatedAt(LocalDateTime.now());
+
+            // 强制将新上传的视频状态设置为 'draft'
+            video.setStatus("draft");
 
             videosService.save(video);
             return Result.success(video);

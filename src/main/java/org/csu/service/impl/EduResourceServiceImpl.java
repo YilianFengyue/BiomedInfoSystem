@@ -22,7 +22,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils; // 导入
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -47,11 +49,15 @@ public class EduResourceServiceImpl extends ServiceImpl<EduResourcesDao, EduReso
 
     @Override
     @Transactional(readOnly = true)
-    public org.springframework.data.domain.Page<ResourceListDto> findPaginated(Integer categoryId, String title, Pageable pageable) {
+    public org.springframework.data.domain.Page<ResourceListDto> findPaginated(Integer categoryId, String title, String status, Pageable pageable) {
 
         LambdaQueryWrapper<EduResources> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(categoryId != null, EduResources::getCategoryId, categoryId);
-        queryWrapper.like(title != null && !title.isBlank(), EduResources::getTitle, title);
+        queryWrapper.like(StringUtils.hasText(title), EduResources::getTitle, title);
+
+        // 【关键新增】如果status参数不为空，则添加状态过滤条件
+        queryWrapper.eq(StringUtils.hasText(status), EduResources::getStatus, status);
+
         queryWrapper.orderByDesc(EduResources::getCreatedAt);
 
         com.baomidou.mybatisplus.extension.plugins.pagination.Page<EduResources> mpPage = new com.baomidou.mybatisplus.extension.plugins.pagination.Page<>(pageable.getPageNumber() + 1, pageable.getPageSize());
@@ -209,5 +215,23 @@ public class EduResourceServiceImpl extends ServiceImpl<EduResourcesDao, EduReso
     @Override
     public IPage<EduResourcesDto> getResourcesWithAuthorByPage(com.baomidou.mybatisplus.extension.plugins.pagination.Page<EduResourcesDto> page) {
         return this.baseMapper.selectResourcesWithAuthor(page);
+    }
+
+    @Override
+    @Transactional
+    public void updateStatus(Long id, String status) {
+        EduResources existingResource = this.getById(id);
+        if (existingResource == null) {
+            throw new BusinessException(Code.UPDATE_ERR, "更新失败：教学资源不存在, ID: " + id);
+        }
+
+        existingResource.setStatus(status);
+
+        // 如果状态是“发布”，且之前没有发布时间，则设置发布时间
+        if ("published".equals(status) && existingResource.getPublishedAt() == null) {
+            existingResource.setPublishedAt(LocalDateTime.now());
+        }
+
+        this.updateById(existingResource);
     }
 }

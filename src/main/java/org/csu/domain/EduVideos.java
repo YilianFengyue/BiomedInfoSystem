@@ -1,3 +1,5 @@
+// 文件路径: src/main/java/org/csu/domain/EduVideos.java
+
 package org.csu.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -8,6 +10,7 @@ import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+
 /**
  * <p>
  * 教学视频库
@@ -59,6 +62,11 @@ public class EduVideos implements Serializable {
      * 外键：上传者的用户ID
      */
     private Long uploaderId;
+
+    /**
+     * 新增：视频状态
+     */
+    private String status;
 
     /**
      * 上传时间

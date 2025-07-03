@@ -2,6 +2,7 @@
 
 package org.csu.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.csu.config.BusinessException;
@@ -21,7 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired; // 【新增】�
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils; // 【新增】导入 CollectionUtils
+import org.springframework.util.StringUtils;
 
 import java.util.Collections; // 【新增】导入 Collections
 import java.util.List;
@@ -63,45 +66,41 @@ public class EduVideosServiceImpl extends ServiceImpl<EduVideosDao, EduVideos> i
      * 【重点修改】重写分页查询逻辑，以包含上传者姓名
      */
     @Override
-    public org.springframework.data.domain.Page<VideoDto> findPaginated(Pageable pageable) {
-        // 1. 将Spring Data的Pageable转换为MyBatis-Plus的Page
+    public org.springframework.data.domain.Page<VideoDto> findPaginated(Pageable pageable, String status) {
         Page<EduVideos> mpPage = new Page<>(pageable.getPageNumber() + 1, pageable.getPageSize());
 
-        // 2. 执行基础分页查询
-        this.page(mpPage, null);
+        // 【关键修改】创建查询条件并添加状态过滤
+        LambdaQueryWrapper<EduVideos> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(StringUtils.hasText(status), EduVideos::getStatus, status);
+        queryWrapper.orderByDesc(EduVideos::getCreatedAt); // 添加排序
+
+        this.page(mpPage, queryWrapper); // 使用带条件的查询
 
         List<EduVideos> videoRecords = mpPage.getRecords();
-        // 如果查询结果为空，直接返回一个空的Spring Page对象
         if (CollectionUtils.isEmpty(videoRecords)) {
             return new PageImpl<>(Collections.emptyList(), pageable, 0);
         }
 
-        // 3. 【新增逻辑】从视频记录中提取所有 uploaderId
         List<Long> uploaderIds = videoRecords.stream()
                 .map(EduVideos::getUploaderId)
-                .distinct() // 去重，减少数据库查询压力
+                .distinct()
                 .collect(Collectors.toList());
 
-        // 4. 【新增逻辑】根据 uploaderIds 批量查询用户资料
         Map<Long, UserProfiles> userProfilesMap = userProfilesService.listByIds(uploaderIds).stream()
                 .collect(Collectors.toMap(UserProfiles::getUserId, Function.identity()));
 
-        // 5. 将查询到的实体列表 List<EduVideos> 转换为 DTO列表 List<VideoDto>
         List<VideoDto> dtoList = videoRecords.stream().map(entity -> {
             VideoDto dto = new VideoDto();
             BeanUtils.copyProperties(entity, dto);
-
-            // 6. 【新增逻辑】从Map中查找并设置上传者姓名
             UserProfiles profile = userProfilesMap.get(entity.getUploaderId());
             if (profile != null) {
-                dto.setUploaderName(profile.getNickname()); // 使用昵称作为上传者姓名
+                dto.setUploaderName(profile.getNickname());
             } else {
-                dto.setUploaderName("未知上传者"); // 如果找不到，提供一个默认值
+                dto.setUploaderName("未知上传者");
             }
             return dto;
         }).collect(Collectors.toList());
 
-        // 7. 使用最终的DTO列表和MP分页结果的总数，创建并返回Spring Data的Page对象
         return new PageImpl<>(dtoList, pageable, mpPage.getTotal());
     }
 
@@ -170,6 +169,20 @@ public class EduVideosServiceImpl extends ServiceImpl<EduVideosDao, EduVideos> i
 
         // 4. 返回组装好的DTO
         return dto;
+    }
+
+    /**
+     * 新增方法的实现
+     */
+    @Override
+    @Transactional
+    public void updateStatus(Long id, String status) {
+        EduVideos existingVideo = this.getById(id);
+        if (existingVideo == null) {
+            throw new BusinessException(Code.UPDATE_ERR, "更新失败：视频不存在, ID: " + id);
+        }
+        existingVideo.setStatus(status);
+        this.updateById(existingVideo);
     }
 }
 

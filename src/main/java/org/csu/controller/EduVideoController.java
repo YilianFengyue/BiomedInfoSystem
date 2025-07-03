@@ -40,10 +40,13 @@ public class EduVideoController {
     @Operation(summary = "分页查询视频库列表")
     public Result<PageDto<VideoDto>> getVideos(
             @RequestParam(defaultValue = "1") Integer pageNum,
-            @RequestParam(defaultValue = "10") Integer pageSize) {
+            @RequestParam(defaultValue = "10") Integer pageSize,
+            // 【新增】接收status参数
+            @RequestParam(required = false) String status) {
 
         Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
-        Page<VideoDto> videoPage = videoService.findPaginated(pageable);
+        // 【修改】将status参数传递给服务层
+        Page<VideoDto> videoPage = videoService.findPaginated(pageable, status);
         return Result.success(new PageDto<>(videoPage));
     }
 
@@ -95,6 +98,23 @@ public class EduVideoController {
     @Operation(summary = "为视频发表留言")
     public Result<CommentDto> postComment(@PathVariable Long id, @Valid @RequestBody CommentCreateDto commentCreateDto) {
         return Result.success(videoInteractionService.postComment(id, commentCreateDto));
+    }
+
+
+    /**
+     * 新增接口：更新视频状态
+     */
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "更新单个视频的状态")
+    public Result<Void> updateVideoStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> payload) {
+        String status = payload.get("status");
+        if (status == null || !List.of("draft", "published", "archived").contains(status)) {
+            return Result.error(Code.VALIDATE_ERR, "无效的状态值");
+        }
+        videoService.updateStatus(id, status);
+        return Result.success();
     }
 }
 

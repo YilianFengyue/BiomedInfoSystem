@@ -15,6 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -33,12 +34,12 @@ public class EduResourceController {
     public Result<Page<ResourceListDto>> getResources(
             @Parameter(description = "分类ID") @RequestParam(required = false) Integer categoryId,
             @Parameter(description = "标题关键字") @RequestParam(required = false) String title,
+            // 【新增】接收status参数
+            @Parameter(description = "资源状态") @RequestParam(required = false) String status,
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-
-        // 返回分页后的数据，确保前端可以正确显示列表
-        return Result.success(resourceService.findPaginated(categoryId, title, pageable));
-
+        // 【修改】将status参数传递给服务层
+        return Result.success(resourceService.findPaginated(categoryId, title, status, pageable));
     }
 
     @GetMapping("/{id}")
@@ -107,4 +108,19 @@ public class EduResourceController {
         resourceVideoLinkService.updateVideoOrderForResource(resourceId, orderedVideoIds);
         return Result.success();
     }
+
+
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "更新单个教学资源的状态")
+    public Result<Void> updateResourceStatus(
+            @PathVariable Long id,
+            @RequestBody Map<String, String> payload) {
+        String status = payload.get("status");
+        if (status == null || !List.of("draft", "published", "archived").contains(status)) {
+            return Result.error(Code.VALIDATE_ERR, "无效的状态值");
+        }
+        resourceService.updateStatus(id, status);
+        return Result.success();
+    }
+
 }

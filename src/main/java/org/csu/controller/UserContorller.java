@@ -238,5 +238,36 @@ public class UserContorller {
         return Result.success(resources);
     }
 
+    /**
+     * 新增接口：获取所有用户列表（包含详细信息）
+     * @return 包含所有用户详细信息的列表
+     */
+    @GetMapping("/all")
+    public Result<List<UserInofDto>> getAllUsers() {
+        List<UserInofDto> allUsers = userService.findAllUsersWithProfiles();
+        return Result.success(allUsers);
+    }
+
+    /**
+     * 新增：重置用户密码（管理员权限）
+     */
+    @PatchMapping("/{id}/reset-password")
+    public Result<Void> resetPassword(@PathVariable Long id) {
+        userService.resetPassword(id);
+        return Result.success(null, "密码已重置为默认值");
+    }
+
+    /**
+     * 新增：修改用户角色（管理员权限）
+     */
+    @PatchMapping("/{id}/role")
+    public Result<Void> updateUserRole(@PathVariable Long id, @RequestBody Map<String, Integer> payload) {
+        Integer newRole = payload.get("role");
+        if (newRole == null || !List.of(0, 1, 2).contains(newRole)) {
+            return Result.error(VALIDATE_ERR, "无效的角色值");
+        }
+        userService.updateUserRole(id, newRole);
+        return Result.success(null, "用户角色更新成功");
+    }
 }
 

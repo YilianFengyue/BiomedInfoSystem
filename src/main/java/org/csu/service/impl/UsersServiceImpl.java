@@ -1,6 +1,8 @@
 package org.csu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import org.csu.config.BusinessException;
+import org.csu.controller.Code;
 import org.csu.dao.EduCategoriesDao;
 import org.csu.dao.EduResourcesDao;
 import org.csu.dao.EduVideosDao;
@@ -266,5 +268,80 @@ public class UsersServiceImpl extends ServiceImpl<UsersDao, Users> implements IU
         combinedResources.sort((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()));
 
         return combinedResources;
+    }
+
+    @Override
+    @Transactional(readOnly = true) // 只读事务，提高查询性能
+    public List<UserInofDto> findAllUsersWithProfiles() {
+        // 1. 查询所有用户
+        List<Users> allUsers = this.list();
+
+        if (allUsers.isEmpty()) {
+            return Collections.emptyList(); // 如果没有用户，直接返回空列表
+        }
+
+        // 2. 提取所有用户的ID
+        List<Long> userIds = allUsers.stream().map(Users::getId).collect(Collectors.toList());
+
+        // 3. 一次性查询所有用户的个人资料
+        Map<Long, UserProfiles> profilesMap = userProfilesService.listByIds(userIds).stream()
+                .collect(Collectors.toMap(UserProfiles::getUserId, Function.identity()));
+
+        // 4. 组装DTO列表
+        return allUsers.stream().map(user -> {
+            UserInofDto dto = new UserInofDto();
+            // 复制Users表中的基础信息
+            BeanUtils.copyProperties(user, dto);
+
+            // 从Map中获取并填充UserProfiles表中的信息
+            UserProfiles profile = profilesMap.get(user.getId());
+            if (profile != null) {
+                dto.setNickname(profile.getNickname());
+                dto.setAvatarUrl(profile.getAvatarUrl());
+                dto.setBio(profile.getBio());
+            }
+            return dto;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 新增：重置密码的实现
+     */
+    @Override
+    @Transactional
+    public void resetPassword(Long userId) {
+        // 1. 检查用户是否存在
+        Users user = this.getById(userId);
+        if (user == null) {
+            throw new BusinessException(Code.UPDATE_ERR, "用户不存在，无法重置密码");
+        }
+
+        // 2. 定义默认密码并哈希
+        String defaultPassword = "012345";
+        String hashedDefaultPassword = PasswordUtil.hashPassword(defaultPassword);
+
+        // 3. 调用已有的密码更新方法
+        this.updatePwd(userId, hashedDefaultPassword);
+    }
+
+    /**
+     * 新增：修改用户角色的实现
+     */
+    @Override
+    @Transactional
+    public void updateUserRole(Long userId, int newRole) {
+        // 1. 检查用户是否存在
+        Users user = this.getById(userId);
+        if (user == null) {
+            throw new BusinessException(Code.UPDATE_ERR, "用户不存在，无法修改角色");
+        }
+
+        // 2. 创建一个只包含ID和待更新role字段的实体
+        Users userToUpdate = new Users();
+        userToUpdate.setId(userId);
+        userToUpdate.setRole(newRole);
+
+        // 3. 执行部分更新
+        this.updateById(userToUpdate);
     }
 }

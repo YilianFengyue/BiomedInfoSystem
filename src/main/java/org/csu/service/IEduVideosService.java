@@ -27,7 +27,8 @@ public interface IEduVideosService extends IService<EduVideos> {
      * @param pageable Spring Data的分页对象
      * @return 包含视频DTO的分页结果
      */
-    Page<VideoDto> findPaginated(Pageable pageable);
+    Page<VideoDto> findPaginated(Pageable pageable, String status);
+
 
     /**
      * 更新视频元数据
@@ -48,4 +49,10 @@ public interface IEduVideosService extends IService<EduVideos> {
 
     VideoDto findById(Long id);
 
+    /**
+     * 新增：更新单个视频的状态
+     * @param id 视频ID
+     * @param status 新的状态
+     */
+    void updateStatus(Long id, String status);
 }
