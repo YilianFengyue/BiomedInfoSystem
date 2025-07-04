@@ -43,6 +43,13 @@
 
     <!-- 项目依赖 -->
     <dependencies>
+
+        <dependency>
+            <groupId>io.livekit</groupId>
+            <artifactId>livekit-server</artifactId>
+            <version>0.10.0</version>
+        </dependency>
+
         <!-- Web开发 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -156,6 +163,17 @@
         </dependency>
 
     </dependencies>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <!-- 构建配置 -->
     <build>
