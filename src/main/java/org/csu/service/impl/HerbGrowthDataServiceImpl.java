@@ -1,5 +1,6 @@
 package org.csu.service.impl;
 
+import java.util.Collections;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.csu.dao.HerbGrowthDataHistoryDao;
 import org.csu.domain.Herb;
@@ -136,8 +137,14 @@ public class HerbGrowthDataServiceImpl extends ServiceImpl<HerbGrowthDataDao, He
         Map<Long, HerbLocation> locationMap = locations.stream().collect(Collectors.toMap(HerbLocation::getId, Function.identity()));
 
         List<Long> herbIds = locations.stream().map(HerbLocation::getHerbId).distinct().collect(Collectors.toList());
-        Map<Long, Herb> herbMap = herbService.listByIds(herbIds).stream().collect(Collectors.toMap(Herb::getId, Function.identity()));
 
+        //  关键修复：如果 herbIds 为空，则 herbMap 也为空，避免无效查询
+        Map<Long, Herb> herbMap;
+        if (herbIds.isEmpty()) {
+            herbMap = Collections.emptyMap();
+        } else {
+            herbMap = herbService.listByIds(herbIds).stream().collect(Collectors.toMap(Herb::getId, Function.identity()));
+        }
 
         // 3. 组装最终的DTO列表
         return histories.stream().map(history -> {
