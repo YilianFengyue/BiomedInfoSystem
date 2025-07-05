@@ -44,4 +44,7 @@ public interface IHerbGrowthDataService extends IService<HerbGrowthData> {
      * @return 增强后的历史记录列表
      */
     List<HerbGrowthDataHistoryDto> getAllHistoryWithDetails(QueryWrapper<HerbGrowthDataHistory> queryWrapper);
+
+    // 【新增方法】创建一个新的方法，专门用于保存数据并记录"CREATE"类型的历史
+    void createGrowthDataAndLogHistory(HerbGrowthData growthData, String uploaderName);
 }

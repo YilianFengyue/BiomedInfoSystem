@@ -10,7 +10,9 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 药材信息控制器
@@ -42,12 +44,60 @@ public class HerbController {
      * @param createDto 包含观测点信息的DTO
      * @return 创建成功后的观测点信息，包含其唯一ID
      */
+    /**
+     * ✅ 已修正: 接收完整的上传数据，并正确调用服务
+     * @param uploadDto 包含所有上传信息的统一DTO
+     * @return 创建成功后的观测点信息
+     */
     @PostMapping("/locations")
-    public Result<HerbLocation> createLocation(@Valid @RequestBody LocationCreateDto createDto) {
-        HerbLocation createdLocation = herbLocationService.createLocation(createDto);
+    public Result<HerbLocation> createLocationAndGrowthData(@Valid @RequestBody HerbUploadDto uploadDto) {
+        // 打印接收到的完整数据，方便调试
+        System.out.println("接收到的完整上传数据: " + uploadDto.toString());
+
+        // 1. 【核心修正】创建一个 LocationCreateDto 实例
+        // 这是为了满足 herbLocationService.createLocation 方法的参数要求。
+        LocationCreateDto locationCreateDto = new LocationCreateDto();
+
+        // 2. 【核心修正】使用 BeanUtils 从主 DTO 复制共有的属性
+        // 将 uploadDto 中的地理位置信息 (longitude, latitude, province等) 复制到 locationCreateDto 中
+        BeanUtils.copyProperties(uploadDto, locationCreateDto);
+
+        // 3. 【核心修正】现在调用服务，参数类型完全匹配
+        HerbLocation createdLocation = herbLocationService.createLocation(locationCreateDto);
+        if (createdLocation == null) {
+            return Result.error(Code.SAVE_ERR, "创建观测点失败");
+        }
+
+        // 4. (逻辑不变) 处理并保存独立的生长数据
+        Map<String, Object> growthDataMap = uploadDto.getGrowthData();
+        if (growthDataMap != null && !growthDataMap.isEmpty()) {
+            HerbGrowthData growthData = new HerbGrowthData();
+            growthData.setLocationId(createdLocation.getId()); // 关键：关联到刚刚创建的观测点ID
+            growthData.setMetricName((String) growthDataMap.get("metricName"));
+            growthData.setMetricValue((String) growthDataMap.get("metricValue"));
+            growthData.setMetricUnit((String) growthDataMap.get("metricUnit"));
+
+            String recordedAtStr = (String) growthDataMap.get("recordedAt");
+            if (recordedAtStr != null) {
+                growthData.setRecordedAt(LocalDateTime.parse(recordedAtStr));
+            }
+
+            //growthDataService.save(growthData); // 调用服务保存生长数据
+            //新的、能记录历史的服务方法
+            growthDataService.createGrowthDataAndLogHistory(growthData, uploadDto.getUploaderName());
+            System.out.println("成功保存生长数据: " + growthData.toString());
+        }
+
+        // 5. (逻辑不变) (可选)处理上传者信息
+        // 这里的逻辑可以根据您是否需要将上传者名字保存到 Herb 表中来决定
+        if (uploadDto.getUploaderName() != null) {
+            System.out.println("上传者: " + uploadDto.getUploaderName());
+            // Herb herb = herbService.getById(uploadDto.getHerbId());
+            // ... 更新 herb 实体的逻辑 ...
+        }
+
         return Result.success(createdLocation);
     }
-
     /**
      * 第二步：为一个已存在的观测点批量上传图片
      * @param locationId 观测点ID

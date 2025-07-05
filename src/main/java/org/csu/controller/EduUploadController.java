@@ -34,7 +34,7 @@ public class EduUploadController {
     @PostMapping("/upload")
     @Operation(summary = "统一上传接口", description = "根据resourceType字段自动区分图文或视频资源")
     public Result<?> uploadResource(@Valid @RequestBody ResourceUploadDto uploadDto) {
-
+        System.out.println("接收到的上传数据: " + uploadDto.toString());
         if ("text".equalsIgnoreCase(uploadDto.getResourceType())) {
             // 处理图文资源
             EduResources resource = new EduResources();

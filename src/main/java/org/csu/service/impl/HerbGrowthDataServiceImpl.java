@@ -9,6 +9,7 @@ import org.csu.dao.HerbGrowthDataDao;
 import org.csu.domain.HerbGrowthDataHistory;
 import org.csu.domain.HerbLocation;
 import org.csu.dto.HerbGrowthDataHistoryDto;
+import org.csu.service.IHerbGrowthDataHistoryService;
 import org.csu.service.IHerbGrowthDataService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.csu.service.IHerbLocationService;
@@ -35,6 +36,10 @@ import java.util.stream.Collectors;
  */
 @Service
 public class HerbGrowthDataServiceImpl extends ServiceImpl<HerbGrowthDataDao, HerbGrowthData> implements IHerbGrowthDataService {
+
+    @Autowired
+    private IHerbGrowthDataHistoryService historyService; // 确保历史服务已注入
+
 
     @Autowired
     private HerbGrowthDataHistoryDao historyDao;
@@ -161,6 +166,32 @@ public class HerbGrowthDataServiceImpl extends ServiceImpl<HerbGrowthDataDao, He
             }
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    /**
+     * 【实现新增历史Create的方法】
+     * 1. 保存主数据
+     * 2. 创建一条对应的历史记录
+     */
+    @Override
+    @Transactional // 建议添加事务注解，确保两个操作要么都成功，要么都失败
+    public void createGrowthDataAndLogHistory(HerbGrowthData growthData, String uploaderName) {
+        // 1. 保存主数据到 herb_growth_data 表
+        this.save(growthData); // growthData在保存后，其ID会被自动填充
+
+        // 2. 创建并保存历史记录到 herb_growth_data_history 表
+        HerbGrowthDataHistory history = new HerbGrowthDataHistory();
+        history.setOriginId(growthData.getId()); // 关联到刚刚创建的主数据ID
+        history.setLocationId(growthData.getLocationId());
+        history.setMetricName(growthData.getMetricName());
+        history.setOldValue(null); // 创建操作没有旧值
+        history.setNewValue(growthData.getMetricValue() + " " + growthData.getMetricUnit());
+        history.setAction("CREATE"); // 操作类型为创建
+        history.setChangedBy(uploaderName); // 使用传入的上传者姓名
+        history.setChangedAt(LocalDateTime.now()); // 记录当前时间
+        history.setRemark("用户初次上传数据");
+
+        historyService.save(history);
     }
 
 }
