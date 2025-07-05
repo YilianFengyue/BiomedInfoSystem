@@ -116,6 +116,7 @@ public class UserContorller {
         dto.setNickname(userProfiles.getNickname());
         dto.setAvatarUrl(userProfiles.getAvatarUrl());
         dto.setBio(userProfiles.getBio());
+        dto.setGender(userProfiles.getGender());
 
         return new Result(GET_OK, dto, "获取成功");
     }
