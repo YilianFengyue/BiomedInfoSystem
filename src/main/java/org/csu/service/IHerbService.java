@@ -61,5 +61,5 @@ public interface IHerbService extends IService<Herb> {
      * @param order 排序顺序 ('asc' or 'desc')
      * @return 分页结果对象
      */
-    IPage<Herb> getHerbsByPage(Integer page, Integer limit, String name, String scientificName, String familyName, String resourceType, String sortBy, String order);
+    IPage<Herb> getHerbsByPage(Integer page, Integer limit, String name, String scientificName, String familyName, String resourceType, String lifeForm, String sortBy, String order);
 }

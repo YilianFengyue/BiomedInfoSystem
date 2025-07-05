@@ -14,6 +14,8 @@ public class HerbDto {
 
     private String familyName;
 
+    private String lifeForm;
+
     private String description;
 
     private String medicinalParts;

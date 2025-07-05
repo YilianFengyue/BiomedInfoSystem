@@ -23,6 +23,7 @@ import org.springframework.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
@@ -273,7 +274,7 @@ public class HerbServiceImpl extends ServiceImpl<HerbDao, Herb> implements IHerb
     }
 
     @Override
-    public IPage<Herb> getHerbsByPage(Integer pageNum, Integer pageSize, String name, String scientificName, String familyName, String resourceType, String sortBy, String order) {
+    public IPage<Herb> getHerbsByPage(Integer pageNum, Integer pageSize, String name, String scientificName, String familyName, String resourceType, String lifeForm, String sortBy, String order) {
         // 1. 创建分页对象
         Page<Herb> page = new Page<>(pageNum, pageSize);
 
@@ -282,17 +283,39 @@ public class HerbServiceImpl extends ServiceImpl<HerbDao, Herb> implements IHerb
 
         // 3. 动态拼接查询条件
         queryWrapper.like(Strings.isNotEmpty(name), Herb::getName, name);
-        queryWrapper.like(Strings.isNotEmpty(scientificName), Herb::getScientificName, scientificName);
+        queryWrapper.eq(Strings.isNotEmpty(scientificName), Herb::getScientificName, scientificName);
         queryWrapper.eq(Strings.isNotEmpty(familyName), Herb::getFamilyName, familyName);
         queryWrapper.eq(Strings.isNotEmpty(resourceType), Herb::getResourceType, resourceType);
 
+        // [!code focus:16]
+        // --- 核心修复：重写生活型(lifeForm)的查询逻辑 ---
+        if (Strings.isNotEmpty(lifeForm)) {
+            // 打印日志，方便调试，您可以在后端控制台看到接收到的原始参数
+            log.info("接收到 lifeForm 原始参数: '{}'", lifeForm);
+
+            // 将前端传来的 "一年生,草本" 字符串分割并去除可能的空格
+            String[] lifeForms = Arrays.stream(lifeForm.split(","))
+                    .map(String::trim)
+                    .filter(Strings::isNotEmpty)
+                    .toArray(String[]::new);
+
+            if (lifeForms.length > 0) {
+                // 再次打印日志，确认分割后的关键词
+                log.info("正在为 life_form 字段应用筛选关键词: {}", Arrays.toString(lifeForms));
+
+                // 为每一个关键词（如 "一年生", "草本"）都添加一个 AND LIKE 条件
+                // 这将确保最终结果的 life_form 字段同时包含所有这些关键词
+                for (String form : lifeForms) {
+                    queryWrapper.like(Herb::getLifeForm, form);
+                }
+            }
+        }
+
         // 4. 处理排序
         boolean isAsc = "asc".equalsIgnoreCase(order);
-        // 使用一个简单的 switch 来防止SQL注入，并处理驼峰到下划线的转换
         if (Strings.isNotEmpty(sortBy)) {
-            // 注意：这里需要确保sortBy的值是安全的，或者与数据库列名匹配
-            // 一个更安全的方式是使用映射或白名单
-            queryWrapper.orderBy(true, isAsc, Herb::getName); // 默认按name排序，可以根据sortBy扩展
+            // 默认按name排序，这里可以根据实际需求扩展
+            queryWrapper.orderBy(true, isAsc, Herb::getName);
         }
 
         // 5. 执行查询
