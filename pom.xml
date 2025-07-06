@@ -140,14 +140,11 @@
         </dependency>
 
         <!--数据校验 -->
-
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
             <version>3.0.2</version>
         </dependency>
-
-
 
         <!-- Baidu AI SDK for Plant Recognition -->
         <dependency>
@@ -160,6 +157,12 @@
                     <artifactId>slf4j-simple</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+
+        <!--neo4j -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-neo4j</artifactId>
         </dependency>
 
     </dependencies>
