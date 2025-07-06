@@ -84,6 +84,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void validateCsrfToken(HttpServletRequest request, Map<String, Object> claims, ValueOperations<String, String> ops) throws CsrfException {
+
+        // --- 新增逻辑开始 ---
+        // 检查是否存在特定的请求头，以识别是否为手机App发出的请求
+        // "X-Requested-With" 是一个常用的、事实上的标准头，用于标识Ajax和移动应用请求
+        String clientIdentifier = request.getHeader("X-Requested-With");
+        if ("com.example.demo_conut".equals(clientIdentifier)) {
+            // 如果请求头匹配我们的App包名，说明是可信的手机客户端，直接跳过CSRF检查
+            return;
+        }
+
         String method = request.getMethod();
         if (!"GET".equalsIgnoreCase(method) && !"HEAD".equalsIgnoreCase(method)) {
             String csrfTokenFromHeader = request.getHeader("X-CSRF-TOKEN");

@@ -5,6 +5,8 @@ import org.csu.dto.HerbDistributionDto;
 import org.csu.dto.HerbGrowthDataDto;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.csu.dto.HerbUploadDetailDto;
+import org.csu.dto.HerbUploadDto;
 
 import java.util.List;
 
@@ -61,5 +63,10 @@ public interface IHerbService extends IService<Herb> {
      * @param order 排序顺序 ('asc' or 'desc')
      * @return 分页结果对象
      */
-    IPage<Herb> getHerbsByPage(Integer page, Integer limit, String name, String scientificName, String familyName, String resourceType, String sortBy, String order);
+    IPage<Herb> getHerbsByPage(Integer page, Integer limit, String name, String scientificName, String familyName, String resourceType, String lifeForm, String sortBy, String order);
+    /**
+     * 【新增 V2】获取所有药材上传的详细数据记录
+     * @return 包含所有上传详情的列表
+     */
+    List<HerbUploadDetailDto> getAllHerbUploadDetails();
 }

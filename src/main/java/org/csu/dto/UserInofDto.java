@@ -28,4 +28,7 @@ public class UserInofDto {
 
     @Schema(description = "个人简介", example = "一位热爱探索的开发者。")
     private String bio;
+
+    @Schema(description = "性别", example = "male")
+    private String gender;
 }

@@ -135,6 +135,7 @@ public class HerbController {
      * @param scientificName 学名模糊查询
      * @param familyName 科名查询
      * @param resourceType 资源类型筛选 ('野生', '栽培')
+     * @param lifeForm       【新增】生活型筛选
      * @param sortBy 排序字段，默认为'name'
      * @param order 排序顺序，默认为'asc'
      * @return 分页的药材列表
@@ -147,9 +148,10 @@ public class HerbController {
             @RequestParam(required = false) String scientificName,
             @RequestParam(required = false) String familyName,
             @RequestParam(required = false) String resourceType,
+            @RequestParam(required = false) String lifeForm,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String order) {
-        IPage<Herb> herbPage = herbService.getHerbsByPage(page, limit, name, scientificName, familyName, resourceType, sortBy, order);
+        IPage<Herb> herbPage = herbService.getHerbsByPage(page, limit, name, scientificName, familyName, resourceType, lifeForm, sortBy, order);
         return Result.success(herbPage);
     }
 
@@ -167,7 +169,7 @@ public class HerbController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer limit) {
         // 直接复用现有的分页服务，只传入name参数进行模糊查询
-        IPage<Herb> herbPage = herbService.getHerbsByPage(page, limit, name, null, null, null, "name", "asc");
+        IPage<Herb> herbPage = herbService.getHerbsByPage(page, limit, name, null, null, null, null, "name", "asc");
         return Result.success(herbPage);
     }
 
@@ -326,4 +328,13 @@ public class HerbController {
         return Result.success(historyList);
     }
 
+    /**
+     * 【新增】获取所有已上传药材的详细数据记录
+     * @return 包含所有上传数据的完整列表
+     */
+    @GetMapping("/uploads/all") // 使用新的URL以示区分
+    public Result<List<HerbUploadDetailDto>> getAllUploadDetails() {
+        List<HerbUploadDetailDto> allData = herbService.getAllHerbUploadDetails();
+        return Result.success(allData);
+    }
 }
