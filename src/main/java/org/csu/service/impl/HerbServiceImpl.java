@@ -1,13 +1,11 @@
 package org.csu.service.impl;
 
-import org.csu.domain.Herb;
-import org.csu.domain.HerbLocation;
-import org.csu.dao.HerbDao;
-import org.csu.dao.HerbLocationDao;
-import org.csu.dao.HerbGrowthDataDao;
-import org.csu.domain.HerbGrowthData;
+import org.csu.dao.*;
+import org.csu.domain.*;
 import org.csu.dto.HerbDistributionDto;
 import org.csu.dto.HerbGrowthDataDto;
+import org.csu.dto.HerbUploadDetailDto;
+import org.csu.dto.HerbUploadDto;
 import org.csu.service.IHerbService;
 import org.csu.config.BusinessException;
 import org.csu.config.SystemException;
@@ -17,6 +15,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -24,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
@@ -45,6 +46,11 @@ public class HerbServiceImpl extends ServiceImpl<HerbDao, Herb> implements IHerb
     
     @Autowired
     private HerbGrowthDataDao herbGrowthDataDao;
+
+    @Autowired
+    private HerbImageDao herbImageDao;
+    @Autowired
+    private HerbGrowthDataHistoryDao historyDao;
     
     // ServiceImpl 已经自动注入了 baseMapper (即 HerbDao)，可以直接使用
     @Override
@@ -320,5 +326,70 @@ public class HerbServiceImpl extends ServiceImpl<HerbDao, Herb> implements IHerb
 
         // 5. 执行查询
         return this.page(page, queryWrapper);
+    }
+
+    /**
+     * 实现获取所有药材上传详情的逻辑
+     */
+    @Override
+    public List<HerbUploadDetailDto> getAllHerbUploadDetails() {
+        // 1. 获取所有地理位置记录作为基础
+        List<HerbLocation> locations = herbLocationDao.selectList(null);
+        if (locations.isEmpty()) {
+            return Collections.emptyList();
+        }
+        List<Long> locationIds = locations.stream().map(HerbLocation::getId).collect(Collectors.toList());
+
+        // 2. 批量获取药材信息
+        List<Long> herbIds = locations.stream().map(HerbLocation::getHerbId).distinct().collect(Collectors.toList());
+        Map<Long, String> herbNameMap = this.listByIds(herbIds).stream()
+                .collect(Collectors.toMap(Herb::getId, Herb::getName));
+
+        // 3. 批量获取图片链接
+        Map<Long, List<String>> imagesMap = herbImageDao
+                .selectList(new LambdaQueryWrapper<HerbImage>().in(HerbImage::getLocationId, locationIds))
+                .stream()
+                .collect(Collectors.groupingBy(HerbImage::getLocationId, Collectors.mapping(HerbImage::getUrl, Collectors.toList())));
+
+        // 4. 批量获取生长数据
+        Map<Long, List<HerbGrowthData>> growthDataMap = herbGrowthDataDao
+                .selectList(new LambdaQueryWrapper<HerbGrowthData>().in(HerbGrowthData::getLocationId, locationIds))
+                .stream()
+                .collect(Collectors.groupingBy(HerbGrowthData::getLocationId));
+
+        // 5. 批量获取历史记录以确定上传者 (这是关键修正)
+        Map<Long, String> uploaderNameMap = historyDao
+                .selectList(new LambdaQueryWrapper<HerbGrowthDataHistory>().in(HerbGrowthDataHistory::getLocationId, locationIds).eq(HerbGrowthDataHistory::getAction, "CREATE"))
+                .stream()
+                .collect(Collectors.toMap(
+                        HerbGrowthDataHistory::getLocationId,
+                        HerbGrowthDataHistory::getChangedBy,
+                        (existing, replacement) -> existing // 如果一个地点有多个CREATE记录，保留第一个
+                ));
+
+        // 6. 最终组装
+        return locations.stream().map(location -> {
+            HerbUploadDetailDto dto = new HerbUploadDetailDto();
+            BeanUtils.copyProperties(location, dto); // 复制基础属性
+            dto.setLocationId(location.getId());
+
+            dto.setHerbName(herbNameMap.get(location.getHerbId()));
+            dto.setUploaderName(uploaderNameMap.get(location.getId())); // 从正确的Map获取上传者
+            dto.setImageUrls(imagesMap.getOrDefault(location.getId(), Collections.emptyList()));
+
+            // 填充生长数据
+            List<HerbGrowthData> growthList = growthDataMap.get(location.getId());
+            if (growthList != null) {
+                dto.setGrowthData(growthList.stream().map(data -> {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("metricName", data.getMetricName());
+                    map.put("metricValue", data.getMetricValue());
+                    map.put("metricUnit", data.getMetricUnit());
+                    return map;
+                }).collect(Collectors.toList()));
+            }
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 }
