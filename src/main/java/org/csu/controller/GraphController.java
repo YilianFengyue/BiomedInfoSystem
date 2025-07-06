@@ -1,7 +1,7 @@
 package org.csu.controller;
 
+import org.csu.controller.Result;
 import org.csu.service.TcmService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
@@ -11,42 +11,50 @@ public class GraphController {
 
     private final TcmService tcmService;
 
+
     public GraphController(TcmService tcmService) {
         this.tcmService = tcmService;
     }
 
     @GetMapping("/formula/{name}")
-    public ResponseEntity<Map<String, Object>> getGraphForFormula(@PathVariable String name) {
-        return ResponseEntity.ok(tcmService.getGraphDataForFormula(name));
+    public Result<Map<String, Object>> getGraphForFormula(@PathVariable String name) {
+        Map<String, Object> graphData = tcmService.getGraphDataForFormula(name);
+        return Result.success(graphData); 
     }
 
     @GetMapping("/disease/{name}")
-    public ResponseEntity<Map<String, Object>> getGraphForDisease(@PathVariable String name) {
-        return ResponseEntity.ok(tcmService.getGraphDataForDisease(name));
+    public Result<Map<String, Object>> getGraphForDisease(@PathVariable String name) {
+        Map<String, Object> graphData = tcmService.getGraphDataForDisease(name);
+        return Result.success(graphData);
     }
 
     @GetMapping("/herb/{name}")
-    public ResponseEntity<Map<String, Object>> getGraphForHerb(@PathVariable String name) {
-        return ResponseEntity.ok(tcmService.getGraphDataForHerb(name));
+    public Result<Map<String, Object>> getGraphForHerb(@PathVariable String name) {
+        Map<String, Object> graphData = tcmService.getGraphDataForHerb(name);
+        return Result.success(graphData);
     }
 
     @GetMapping("/symptom/{name}")
-    public ResponseEntity<Map<String, Object>> getGraphForSymptom(@PathVariable String name) {
-        return ResponseEntity.ok(tcmService.getGraphDataForSymptom(name));
+    public Result<Map<String, Object>> getGraphForSymptom(@PathVariable String name) {
+        Map<String, Object> graphData = tcmService.getGraphDataForSymptom(name);
+        return Result.success(graphData);
     }
 
     @GetMapping("/syndrome/{name}")
-    public ResponseEntity<Map<String, Object>> getGraphForSyndrome(@PathVariable String name) {
-        return ResponseEntity.ok(tcmService.getGraphDataForSyndrome(name));
+    public Result<Map<String, Object>> getGraphForSyndrome(@PathVariable String name) {
+        Map<String, Object> graphData = tcmService.getGraphDataForSyndrome(name);
+        return Result.success(graphData);
     }
 
     @GetMapping("/meridian/{name}")
-    public ResponseEntity<Map<String, Object>> getGraphForMeridian(@PathVariable String name) {
-        return ResponseEntity.ok(tcmService.getGraphDataForMeridian(name));
+    public Result<Map<String, Object>> getGraphForMeridian(@PathVariable String name) {
+        Map<String, Object> graphData = tcmService.getGraphDataForMeridian(name);
+        return Result.success(graphData);
     }
 
     @GetMapping("/acupoint/{name}")
-    public ResponseEntity<Map<String, Object>> getGraphForAcupoint(@PathVariable String name) {
-        return ResponseEntity.ok(tcmService.getGraphDataForAcupoint(name));
+    public Result<Map<String, Object>> getGraphForAcupoint(@PathVariable String name) {
+        Map<String, Object> graphData = tcmService.getGraphDataForAcupoint(name);
+        return Result.success(graphData);
     }
 }

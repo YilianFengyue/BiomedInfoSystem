@@ -162,12 +162,12 @@ public class TcmServiceImpl implements TcmService {
     }
     private Map<String, Object> createLink(Long sourceId, Long targetId, String label) {
         Map<String, Object> link = new HashMap<>();
-        link.put("source", sourceId.toString()); // 起点ID
-        link.put("target", targetId.toString()); // 终点ID
+        link.put("source", sourceId.toString());
+        link.put("target", targetId.toString());
 
-        // ECharts的配置，用于在关系连线上显示标签文字
+        // **【核心修改】**：直接将label作为顶层属性
         if (label != null && !label.isBlank()) {
-            link.put("label", Map.of("show", true, "formatter", label));
+            link.put("label", label);
         }
 
         return link;
