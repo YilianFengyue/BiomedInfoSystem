@@ -328,4 +328,13 @@ public class HerbController {
         return Result.success(historyList);
     }
 
+    /**
+     * 【新增】获取所有已上传药材的详细数据记录
+     * @return 包含所有上传数据的完整列表
+     */
+    @GetMapping("/uploads/all") // 使用新的URL以示区分
+    public Result<List<HerbUploadDetailDto>> getAllUploadDetails() {
+        List<HerbUploadDetailDto> allData = herbService.getAllHerbUploadDetails();
+        return Result.success(allData);
+    }
 }
