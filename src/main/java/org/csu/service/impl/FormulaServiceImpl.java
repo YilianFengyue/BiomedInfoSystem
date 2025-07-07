@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.LinkedHashMap;
 
 @Service
 public class FormulaServiceImpl implements IFormulaService {
@@ -162,7 +163,35 @@ public class FormulaServiceImpl implements IFormulaService {
 
     @Override
     public FormulaComparisonVO compareFormulas(List<Long> formulaIds) {
-        // Placeholder implementation
-        return new FormulaComparisonVO();
+        if (formulaIds == null || formulaIds.size() < 2) {
+            // Can't compare less than 2 formulas
+            return new FormulaComparisonVO();
+        }
+
+        // 1. Fetch details for all formulas
+        List<Formula> formulas = formulaDao.selectBatchIds(formulaIds);
+        List<FormulaDetailVO> formulaDetails = formulas.stream()
+                .map(formula -> {
+                    FormulaDetailVO vo = new FormulaDetailVO();
+                    BeanUtils.copyProperties(formula, vo);
+                    return vo;
+                }).collect(Collectors.toList());
+
+        // 2. Create comparison map
+        Map<String, List<String>> comparisonPoints = new LinkedHashMap<>(); // Use LinkedHashMap to maintain order
+
+        comparisonPoints.put("方剂名称", formulas.stream().map(Formula::getName).collect(Collectors.toList()));
+        comparisonPoints.put("出处", formulas.stream().map(Formula::getSource).collect(Collectors.toList()));
+        comparisonPoints.put("功用", formulas.stream().map(Formula::getFunctionEffect).collect(Collectors.toList()));
+        comparisonPoints.put("主治", formulas.stream().map(Formula::getMainTreatment).collect(Collectors.toList()));
+        comparisonPoints.put("药物组成", formulas.stream().map(Formula::getComposition).collect(Collectors.toList()));
+
+
+        // 3. Build the final VO
+        FormulaComparisonVO result = new FormulaComparisonVO();
+        result.setFormulas(formulaDetails);
+        result.setComparisonPoints(comparisonPoints);
+
+        return result;
     }
 } 
