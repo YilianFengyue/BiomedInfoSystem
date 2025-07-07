@@ -21,6 +21,7 @@ public class FormulaNode {
     private String usage;       // 用法
     private String function;    // 功用
     private String indication;  // 主治
+    private String description;
 
     // 关系：方剂 -> 包含 -> 药材 (通过关系实体HerbComponent)
     @Relationship(type = "CONTAINS", direction = Relationship.Direction.OUTGOING)

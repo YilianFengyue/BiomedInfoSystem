@@ -34,10 +34,10 @@ public class DataMigrationRunner implements CommandLineRunner {
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        if (formulaRepository.count() > 0) {
-            System.out.println("Neo4j数据库中已有数据，跳过本次数据迁移。");
-            return;
-        }
+//        if (formulaRepository.count() > 0) {
+//            System.out.println("Neo4j数据库中已有数据，跳过本次数据迁移。");
+//            return;
+//        }
 
         System.out.println("--- [数据迁移] 开始 ---");
         migrateNodes();
@@ -55,6 +55,7 @@ public class DataMigrationRunner implements CommandLineRunner {
                 HerbNode node = new HerbNode();
                 node.setName(name);
                 // 将MySQL的description(简介/药用价值描述) 映射到 Neo4j实体中的effect(功效)字段
+                node.setDescription((String) row.get("description"));
                 node.setEffect((String) row.get("description"));
                 return herbRepository.save(node);
             });
@@ -80,6 +81,7 @@ public class DataMigrationRunner implements CommandLineRunner {
             formulaRepository.findByName(name).orElseGet(() -> {
                 FormulaNode node = new FormulaNode();
                 node.setName(name);
+                node.setDescription((String) row.get("function_effect"));
                 node.setSource((String) row.get("source"));
                 node.setComposition((String) row.get("composition"));
                 node.setUsage((String) row.get("usage"));
@@ -98,9 +100,10 @@ public class DataMigrationRunner implements CommandLineRunner {
         System.out.println("步骤2/2: 正在创建节点间的关系...");
 
         // 创建 (Disease)-[:HAS_SYMPTOM]->(Symptom) 关系
-        jdbcTemplate.queryForList("SELECT name, symptoms FROM disease").forEach(row -> {
+        jdbcTemplate.queryForList("SELECT name, symptoms, pathogenesis FROM disease").forEach(row -> {
             String diseaseName = (String) row.get("name");
             String symptomsStr = (String) row.get("symptoms");
+            String pathogenesis = (String) row.get("pathogenesis");
             diseaseRepository.findByName(diseaseName).ifPresent(diseaseNode -> {
                 if (symptomsStr != null && !symptomsStr.isEmpty()) {
                     Arrays.stream(symptomsStr.split("，|、| "))
@@ -109,6 +112,7 @@ public class DataMigrationRunner implements CommandLineRunner {
                                 SymptomNode symptomNode = symptomRepository.findByName(symptomName).orElseGet(() -> {
                                     SymptomNode newSymptom = new SymptomNode();
                                     newSymptom.setName(symptomName);
+                                    newSymptom.setDescription("临床表现为: " + symptomName);
                                     return symptomRepository.save(newSymptom);
                                 });
                                 if (diseaseNode.getSymptoms() == null) diseaseNode.setSymptoms(new HashSet<>());
@@ -164,6 +168,7 @@ public class DataMigrationRunner implements CommandLineRunner {
                         SyndromeNode syndromeNode = syndromeRepository.findByName(syndromeName).orElseGet(() -> {
                             SyndromeNode newSyndrome = new SyndromeNode();
                             newSyndrome.setName(syndromeName);
+                            newSyndrome.setDescription(syndromeName);
                             return syndromeRepository.save(newSyndrome);
                         });
                         // 建立 Formula -> Syndrome 关系
