@@ -3,7 +3,9 @@ package org.csu.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.csu.dao.FormulaDao;
+import org.csu.dao.FormulaHerbDao;
 import org.csu.domain.Formula;
+import org.csu.domain.FormulaHerb;
 import org.csu.dto.*;
 import org.csu.service.IFormulaService;
 import org.springframework.beans.BeanUtils;
@@ -13,6 +15,8 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,6 +24,9 @@ public class FormulaServiceImpl implements IFormulaService {
 
     @Autowired
     private FormulaDao formulaDao;
+
+    @Autowired
+    private FormulaHerbDao formulaHerbDao;
 
     // @Autowired
     // private KnowledgeGraphService knowledgeGraphService;
@@ -113,8 +120,44 @@ public class FormulaServiceImpl implements IFormulaService {
 
     @Override
     public List<HerbCombinationVO> analyzeHerbCombinations(String herbName) {
-        // Placeholder implementation
-        return Collections.emptyList();
+        // 1. 查找所有包含目标药材的方剂ID
+        LambdaQueryWrapper<FormulaHerb> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FormulaHerb::getHerbName, herbName)
+                    .select(FormulaHerb::getFormulaId);
+
+        List<Long> formulaIds = formulaHerbDao.selectList(queryWrapper).stream()
+                .map(FormulaHerb::getFormulaId)
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (formulaIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 2. 查找这些方剂中的所有药材
+        LambdaQueryWrapper<FormulaHerb> coOccurrenceWrapper = new LambdaQueryWrapper<>();
+        coOccurrenceWrapper.in(FormulaHerb::getFormulaId, formulaIds);
+        List<FormulaHerb> allRelatedHerbs = formulaHerbDao.selectList(coOccurrenceWrapper);
+
+        // 3. 排除目标药材自身，并统计其他药材的出现频率
+        Map<String, Long> frequencyMap = allRelatedHerbs.stream()
+                .map(FormulaHerb::getHerbName)
+                .filter(name -> !name.equals(herbName))
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+        // 4. 计算配伍比例并封装成VO
+        long totalFormulasWithHerb = formulaIds.size();
+        return frequencyMap.entrySet().stream()
+                .map(entry -> {
+                    HerbCombinationVO vo = new HerbCombinationVO();
+                    vo.setHerbName(entry.getKey());
+                    vo.setCombinationCount(entry.getValue());
+                    // 配伍比例 = 出现次数 / 包含目标药材的总方剂数
+                    vo.setCombinationRatio((double) entry.getValue() / totalFormulasWithHerb);
+                    return vo;
+                })
+                .sorted((v1, v2) -> Long.compare(v2.getCombinationCount(), v1.getCombinationCount()))
+                .collect(Collectors.toList());
     }
 
     @Override
