@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS `biomed_info_system`;
+CREATE DATABASE `biomed_info_system`;
+USE `biomed_info_system`;
+
 /*
  Navicat Premium Data Transfer
 
@@ -747,7 +751,7 @@ INSERT INTO `herb_image` VALUES (83, 34, 85, 'https://biomedinfo.oss-cn-beijing.
 -- Table structure for herb_location
 -- ----------------------------
 DROP TABLE IF EXISTS `herb_location`;
-CREATE TABLE `herb_location`  (
+CREATE TABLE `herb_location` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID, 代表一次唯一的观测记录',
   `herb_id` bigint NOT NULL COMMENT '外键：关联的药材ID',
   `longitude` decimal(10, 7) NOT NULL COMMENT '经度 (e.g., 116.404269)',
@@ -1016,62 +1020,60 @@ DROP TABLE IF EXISTS `research_achievement`;
 CREATE TABLE `research_achievement`  (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `project_id` bigint NULL DEFAULT NULL COMMENT '关联项目ID',
-  `achievement_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '成果类型',
-  `title` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '成果标题',
-  `authors` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '作者',
-  `first_author_id` bigint NULL DEFAULT NULL COMMENT '第一作者ID',
-  `publication` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '发表期刊/出版社',
+  `achievement_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '成果类型',
+  `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '成果标题',
+  `authors` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '作者',
+  `publication` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '发表期刊/出版社',
   `publish_date` date NULL DEFAULT NULL COMMENT '发表日期',
-  `impact_factor` decimal(6, 3) NULL DEFAULT NULL COMMENT '影响因子',
+  `impact_factor` decimal(5, 3) NULL DEFAULT NULL COMMENT '影响因子',
   `citation_count` int NULL DEFAULT 0 COMMENT '引用次数',
-  `doi` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'DOI',
-  `abstract` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '摘要',
-  `keywords` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '关键词',
-  `file_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '文件地址',
-  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'published' COMMENT '状态',
+  `doi` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'DOI',
+  `abstract_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '摘要',
+  `keywords` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '关键词',
+  `file_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '文件地址',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending' COMMENT '状态',
   `created_by` bigint NULL DEFAULT NULL COMMENT '创建人',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
-  INDEX `first_author_id`(`first_author_id` ASC) USING BTREE,
-  INDEX `idx_project`(`project_id` ASC) USING BTREE,
-  INDEX `idx_type`(`achievement_type` ASC) USING BTREE,
-  CONSTRAINT `research_achievement_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `research_project` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
-  CONSTRAINT `research_achievement_ibfk_2` FOREIGN KEY (`first_author_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '科研成果表' ROW_FORMAT = Dynamic;
+  INDEX `idx_project_id`(`project_id` ASC) USING BTREE,
+  INDEX `idx_achievement_type`(`achievement_type` ASC) USING BTREE,
+  INDEX `idx_publish_date`(`publish_date` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '科研成果表(论文、专利等)' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of research_achievement
 -- ----------------------------
-INSERT INTO `research_achievement` VALUES (1, 1, 'paper', 'Network pharmacology-based investigation of Xuefu Zhuyu Decoction in treating coronary heart disease', '王老师,Lin,luyue', 101, 'Journal of Ethnopharmacology', '2024-06-15', 4.360, 12, '10.1016/j.jep.2024.117892', NULL, NULL, NULL, 'published', NULL, '2025-07-06 11:02:16');
-INSERT INTO `research_achievement` VALUES (2, 2, 'paper', 'Wild medicinal plant resources survey in Chongqing region: current status and conservation strategies', 'Lin,王银波,Huqi', 108, 'Chinese Medicine', '2024-03-22', 3.850, 8, '10.1186/s13020-024-00895-x', NULL, NULL, NULL, 'published', NULL, '2025-07-06 11:02:16');
-INSERT INTO `research_achievement` VALUES (3, 3, 'patent', '基于深度学习的中医舌象自动识别方法', 'luyue,Lin,王老师', 109, '国家知识产权局', '2024-05-10', NULL, 0, 'CN202410567891.2', NULL, NULL, NULL, 'published', NULL, '2025-07-06 11:02:16');
+INSERT INTO `research_achievement` (`project_id`, `achievement_type`, `title`, `authors`, `publication`, `publish_date`, `impact_factor`, `citation_count`, `doi`, `abstract_text`, `keywords`, `file_url`, `status`, `created_by`)
+VALUES
+(1, '论文', '小青龙汤治疗过敏性鼻炎的临床研究', '张三, 李四', '中华中医药杂志', '2023-05-10', 2.150, 15, '10.1000/xyz123', '目的：探讨小青龙汤治疗过敏性鼻炎的临床疗效。方法：选取100例过敏性鼻炎患者随机分为治疗组和对照组...', '小青龙汤, 过敏性鼻炎, 临床研究', 'http://example.com/paper1.pdf', 'approved', 1),
+(1, '论文', '桂枝汤加减治疗体虚感冒的系统评价', '王五, 赵六', '中国中药杂志', '2022-11-20', 3.450, 45, '10.1000/abc789', '目的：系统评价桂枝汤加减治疗体虚感冒的有效性及安全性。方法：检索多个数据库，收集相关随机对照试验进行Meta分析...', '桂枝汤, 体虚感冒, Meta分析', 'http://example.com/paper2.pdf', 'approved', 1),
+(2, '专利', '一种从黄芪中提取多糖的新工艺', '钱七', NULL, '2024-01-15', NULL, NULL, 'CN12345678A', '本发明公开了一种从黄芪中高效提取黄芪多糖的工艺方法，包括超声辅助提取、双水相萃取纯化等步骤...', '黄芪多糖, 提取工艺, 专利', 'http://example.com/patent1.pdf', 'approved', 2);
 
 -- ----------------------------
 -- Table structure for research_project
 -- ----------------------------
 DROP TABLE IF EXISTS `research_project`;
-CREATE TABLE `research_project`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `project_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '项目名称',
-  `project_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '项目编号',
-  `project_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '项目类型',
-  `funding_source` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '资助来源',
-  `funding_amount` decimal(12, 2) NULL DEFAULT NULL COMMENT '资助金额',
-  `principal_investigator` bigint NULL DEFAULT NULL COMMENT '项目负责人ID',
-  `start_date` date NULL DEFAULT NULL COMMENT '开始日期',
-  `end_date` date NULL DEFAULT NULL COMMENT '结束日期',
-  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'active' COMMENT '状态',
-  `abstract` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '项目摘要',
-  `keywords` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '关键词',
-  `research_field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '研究领域',
-  `achievements` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '项目成果',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`) USING BTREE,
-  INDEX `idx_pi`(`principal_investigator` ASC) USING BTREE,
-  INDEX `idx_status`(`status` ASC) USING BTREE,
-  CONSTRAINT `research_project_ibfk_1` FOREIGN KEY (`principal_investigator`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '科研项目表' ROW_FORMAT = Dynamic;
+CREATE TABLE `research_project` (
+    `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+    `project_name` VARCHAR(200) NOT NULL COMMENT '项目名称',
+    `project_code` VARCHAR(50) COMMENT '项目编号',
+    `project_type` VARCHAR(50) COMMENT '项目类型',
+    `funding_source` VARCHAR(100) COMMENT '资助来源',
+    `funding_amount` DECIMAL(12,2) COMMENT '资助金额',
+    `principal_investigator` BIGINT COMMENT '项目负责人ID',
+    `start_date` DATE COMMENT '开始日期',
+    `end_date` DATE COMMENT '结束日期',
+    `status` VARCHAR(20) DEFAULT 'active' COMMENT '状态',
+    `abstract_text` TEXT COMMENT '项目摘要',
+    `keywords` VARCHAR(500) COMMENT '关键词',
+    `research_field` VARCHAR(100) COMMENT '研究领域',
+    `achievements` TEXT COMMENT '项目成果',
+    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX `idx_pi` (`principal_investigator`),
+    INDEX `idx_status` (`status`),
+    INDEX `idx_type` (`project_type`)
+) COMMENT '科研项目表';
 
 -- ----------------------------
 -- Records of research_project
@@ -1369,5 +1371,21 @@ INSERT INTO `formula_case` (`formula_id`, `case_title`, `patient_info`, `chief_c
 -- 7. 插入方剂评价 (以四君子汤为例)
 INSERT INTO `formula_evaluation` (`formula_id`, `evaluator_id`, `evaluation_type`, `score`, `evaluation_content`, `status`) VALUES
 (2, 108, '临床疗效', 4.8, '我母亲脾胃虚弱，食欲不振，服用四君子汤加减化裁后，食欲明显改善，精神状态也好了很多，是健脾益气良方。', 'approved');
+
+-- ----------------------------
+-- Records for Research Module
+-- ----------------------------
+
+-- 1. 插入科研项目
+INSERT INTO `research_project` (`id`, `project_name`, `project_code`, `project_type`, `principal_investigator`, `start_date`, `end_date`, `status`, `abstract_text`) VALUES
+(1, '中药复方A对阿尔茨海默病模型大鼠神经保护作用的机制研究', 'NSFC-81873200', '国家自然科学基金面上项目', 101, '2019-01-01', '2022-12-31', 'completed', '本项目旨在研究中药复方A通过调控神经炎症和氧化应激对AD模型大鼠的神经保护作用及其分子机制。'),
+(2, '针刺对功能性消化不良患者胃肠动力及脑-肠轴调控的研究', 'MOST-2021YFC0000', '国家重点研发计划', 108, '2022-01-01', '2025-12-31', 'active', '本项目拟通过多中心、随机对照试验，探讨针刺治疗功能性消化不良的临床疗效，并利用多模态神经影像技术研究其对中枢及外周胃肠动力的影响。');
+
+-- 2. 插入科研成果 (论文)
+INSERT INTO `research_achievement` (`project_id`, `achievement_type`, `title`, `authors`, `publication`, `publish_date`, `doi`, `keywords`, `status`, `created_by`, `citation_count`, `abstract_text`) VALUES
+(1, 'paper', 'Neuroprotective effects of Chinese herbal formula A on cognitive impairment in a rat model of Alzheimer''s disease', '张三, 李四, 王五', 'Journal of Ethnopharmacology', '2021-06-15', '10.1016/j.jep.2021.114000', '阿尔茨海默病; 中药; 神经保护; 氧化应激', 'published', 101, 15, '研究发现，中药复方A能显著改善AD模型大鼠的学习记忆能力，其机制可能与抑制海马区小胶质细胞活化和降低氧化应激水平有关。'),
+(1, 'paper', 'Traditional Chinese medicine as a promising strategy for the treatment of Alzheimer''s disease', '李四, 赵六', 'Phytomedicine', '2022-03-20', '10.1016/j.phymed.2022.153888', '中医药; 阿尔茨海默病; 综述', 'published', 101, 8, '本文综述了近年来中医药在AD治疗方面的研究进展，总结了多种活性成分和复方的潜在作用靶点和机制，并展望了其未来的研究方向。'),
+(2, 'paper', 'Efficacy of Acupuncture on Dyspepsia: A Randomized Controlled Trial', '王五, 孙七', 'The Lancet Gastroenterology & Hepatology', '2023-11-01', '10.1016/S2468-1253(23)00300-X', '针刺; 功能性消化不良; 随机对照试验', 'published', 108, 2, '研究结果表明，与假针刺相比，真实针刺能显著改善功能性消化不良患者的餐后不适综合征和上腹痛综合征评分。'),
+(NULL, 'patent', '一种用于改善记忆的中药组合物及其制备方法', '张三', '国家知识产权局', '2022-08-10', 'CN115000000A', '中药; 专利; 记忆', 'published', 101, 0, '本发明公开了一种包含人参、远志等药材的中药组合物，实验表明其具有显著改善学习记忆障碍的作用。');
 
 SET FOREIGN_KEY_CHECKS = 1;
