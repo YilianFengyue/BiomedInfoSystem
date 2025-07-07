@@ -1,6 +1,7 @@
 package org.csu.domain;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class Formula {
     private Integer categoryId;
     private String composition;
     private String preparation;
+    @TableField("`usage`")
     private String usage;
     private String dosageForm;
     private String functionEffect;

@@ -1311,4 +1311,63 @@ INSERT INTO `video_likes` VALUES (6, 6, 108, '2025-07-02 19:17:29');
 INSERT INTO `video_likes` VALUES (7, 10, 112, '2025-07-03 17:34:09');
 INSERT INTO `video_likes` VALUES (8, 11, 109, '2025-07-03 18:31:09');
 
+-- ----------------------------
+-- Records for Formula Module
+-- ----------------------------
+
+-- 1. 插入方剂分类
+INSERT INTO `formula_category` (`id`, `name`, `parent_id`, `description`) VALUES
+(1, '解表剂', 0, '用于治疗表证的方剂'),
+(2, '补益剂', 0, '用于补益气血阴阳的方剂'),
+(3, '理血剂', 0, '用于理血调血的方剂'),
+(4, '清热剂', 0, '用于清热解毒的方剂');
+
+-- 2. 插入方剂基本信息 (假设 category_id 与上面对应, created_by 假设为用户ID 101)
+INSERT INTO `formula` (`id`, `name`, `alias`, `source`, `dynasty`, `author`, `category_id`, `composition`, `preparation`, `usage`, `dosage_form`, `function_effect`, `main_treatment`, `status`, `created_by`) VALUES
+(1, '麻黄汤', NULL, '伤寒论', '汉代', '张仲景', 1, '麻黄、桂枝、杏仁、甘草', '上四味，以水九升，先煮麻黄，减二升，去上沫，内诸药，煮取二升半，去滓，温服八合。', '温服，服后取微汗。', '汤剂', '发汗解表，宣肺平喘', '外感风寒表实证。症见恶寒发热，头身疼痛，无汗而喘，舌苔薄白，脉浮紧。', 1, 101),
+(2, '四君子汤', '四君汤', '太平惠民和剂局方', '宋代', '陈师文', 2, '人参、白术、茯苓、炙甘草', '上为末，每服二钱，水一盏，煎至七分，通口服，不拘时候。', '水煎服。', '汤剂', '益气健脾', '脾胃气虚证。面色萎黄，语声低微，气短乏力，食少便溏，舌淡苔白，脉虚弱。', 1, 101),
+(3, '血府逐瘀汤', NULL, '医林改错', '清代', '王清任', 3, '桃仁、红花、当归、生地黄、牛膝、川芎、桔梗、赤芍、枳壳、甘草、柴胡', '水煎服', '每日一剂，分两次温服。', '汤剂', '活血化瘀，行气止痛', '胸中血瘀证。胸痛，头痛，日久不愈，痛如针刺而有定处，或呃逆日久不止，或饮水即呛，干呕，或内热瞀闷，心悸失眠，急躁易怒，入暮潮热，唇暗或两目暗黑，舌质暗红，或舌有瘀斑、瘀点，脉涩或弦紧。', 1, 101),
+(4, '银翘散', NULL, '温病条辨', '清代', '吴鞠通', 4, '金银花、连翘、苦桔梗、薄荷、竹叶、生甘草、荆芥穗、淡豆豉、牛蒡子', '上杵为散，每服六钱，鲜苇根汤煎，香气大出，即取服，勿过煎。', '苇根汤煎，温服。', '散剂/汤剂', '辛凉透表，清热解毒', '温病初起。发热，微恶风寒，无汗或有汗不畅，头痛口渴，咳嗽咽痛，舌尖红，苔薄白或薄黄，脉浮数。', 1, 101);
+
+-- 3. 插入方剂-药物组成 (假设 herb_id 为药材表中的ID)
+-- 麻黄汤 (formula_id = 1)
+INSERT INTO `formula_herb` (`formula_id`, `herb_id`, `herb_name`, `dosage`, `unit`, `role`) VALUES
+(1, 10, '麻黄', '9', 'g', '君药'),
+(1, 11, '桂枝', '6', 'g', '臣药'),
+(1, 12, '杏仁', '9', 'g', '佐药'),
+(1, 13, '炙甘草', '3', 'g', '使药');
+-- 四君子汤 (formula_id = 2)
+INSERT INTO `formula_herb` (`formula_id`, `herb_id`, `herb_name`, `dosage`, `unit`, `role`) VALUES
+(2, 1, '人参', '9', 'g', '君药'),
+(2, 14, '白术', '9', 'g', '臣药'),
+(2, 15, '茯苓', '9', 'g', '佐药'),
+(2, 13, '炙甘草', '6', 'g', '使药');
+-- 血府逐瘀汤 (formula_id = 3)
+INSERT INTO `formula_herb` (`formula_id`, `herb_id`, `herb_name`, `dosage`, `unit`, `role`) VALUES
+(3, 20, '桃仁', '12', 'g', '臣药'),
+(3, 21, '红花', '9', 'g', '臣药'),
+(3, 3, '当归', '9', 'g', '君药'),
+(3, 22, '生地黄', '9', 'g', '佐药'),
+(3, 23, '川芎', '5', 'g', '佐药');
+
+-- 4. 插入方剂-主治疾病关联
+INSERT INTO `formula_disease` (`formula_id`, `disease_name`, `disease_code`, `syndrome`, `efficacy_level`) VALUES
+(1, '外感风寒', 'J00.001', '风寒束表，肺气不宣证', 5),
+(2, '脾胃虚弱', 'K59.001', '脾胃气虚证', 5),
+(3, '胸痹心痛', 'I20.001', '气滞血瘀证', 5),
+(3, '头痛', 'G44.001', '瘀血头痛', 4),
+(4, '风热感冒', 'J00.002', '风热犯卫证', 5);
+
+-- 5. 插入方剂加减变化 (以麻黄汤为例)
+INSERT INTO `formula_modification` (`base_formula_id`, `modified_name`, `modification_type`, `condition_description`, `herb_changes`) VALUES
+(1, '三拗汤', '减味', '适用于外感风寒，肺气不宣之咳嗽声重，痰涕清稀，鼻塞，恶寒发热，无汗，头痛，苔薄白，脉浮紧。', '麻黄汤去桂枝');
+
+-- 6. 插入方剂临床验案 (以血府逐瘀汤为例)
+INSERT INTO `formula_case` (`formula_id`, `case_title`, `patient_info`, `chief_complaint`, `history_present`, `tcm_diagnosis`, `treatment_principle`, `prescription`, `outcome`, `doctor_name`, `case_date`) VALUES
+(3, '王某某，头痛案', '患者，男，45岁', '反复性头痛五年，痛如针刺，部位固定', '患者五年前无明显诱因出现头痛，呈持续性刺痛，位于左侧巅顶，每因情绪激动或劳累后加重。曾多方求医，效果不佳。近一月疼痛加剧，伴有心烦易怒，夜寐不安。', '头痛（瘀血头痛）', '活血化瘀，行气止痛', '血府逐瘀汤原方，七剂', '服药七剂后，头痛明显减轻，睡眠改善。继续调理半月，头痛基本消失，随访半年未复发。', '李医生', '2023-05-10');
+
+-- 7. 插入方剂评价 (以四君子汤为例)
+INSERT INTO `formula_evaluation` (`formula_id`, `evaluator_id`, `evaluation_type`, `score`, `evaluation_content`, `status`) VALUES
+(2, 108, '临床疗效', 4.8, '我母亲脾胃虚弱，食欲不振，服用四君子汤加减化裁后，食欲明显改善，精神状态也好了很多，是健脾益气良方。', 'approved');
+
 SET FOREIGN_KEY_CHECKS = 1;
