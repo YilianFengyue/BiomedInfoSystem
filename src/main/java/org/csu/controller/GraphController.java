@@ -19,7 +19,7 @@ public class GraphController {
     @GetMapping("/formula/{name}")
     public Result<Map<String, Object>> getGraphForFormula(@PathVariable String name) {
         Map<String, Object> graphData = tcmService.getGraphDataForFormula(name);
-        return Result.success(graphData); 
+        return Result.success(graphData);
     }
 
     @GetMapping("/disease/{name}")
