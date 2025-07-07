@@ -1,21 +1,17 @@
-DROP DATABASE IF EXISTS `biomed_info_system`;
-CREATE DATABASE `biomed_info_system`;
-USE `biomed_info_system`;
-
 /*
  Navicat Premium Data Transfer
 
- Source Server         : mypetstore
+ Source Server         : 6
  Source Server Type    : MySQL
- Source Server Version : 90001 (9.0.1)
+ Source Server Version : 80011 (8.0.11)
  Source Host           : localhost:3306
  Source Schema         : biomed_info_system
 
  Target Server Type    : MySQL
- Target Server Version : 90001 (9.0.1)
+ Target Server Version : 80011 (8.0.11)
  File Encoding         : 65001
 
- Date: 06/07/2025 15:02:31
+ Date: 07/07/2025 19:12:07
 */
 
 SET NAMES utf8mb4;
@@ -26,20 +22,20 @@ SET FOREIGN_KEY_CHECKS = 0;
 -- ----------------------------
 DROP TABLE IF EXISTS `ai_conversation`;
 CREATE TABLE `ai_conversation`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
   `session_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '会话ID',
   `message_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '消息类型(user/assistant)',
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '消息内容',
   `context` json NULL COMMENT '上下文信息',
   `model_used` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '使用的AI模型',
-  `response_time` int NULL DEFAULT NULL COMMENT '响应时间(毫秒)',
+  `response_time` int(11) NULL DEFAULT NULL COMMENT '响应时间(毫秒)',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_user_session`(`user_id` ASC, `session_id` ASC) USING BTREE,
   INDEX `idx_created`(`created_at` ASC) USING BTREE,
   CONSTRAINT `ai_conversation_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'AI对话记录表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'AI对话记录表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of ai_conversation
@@ -54,20 +50,20 @@ INSERT INTO `ai_conversation` VALUES (4, 109, 'sess_20240702_001', 'assistant', 
 -- ----------------------------
 DROP TABLE IF EXISTS `course`;
 CREATE TABLE `course`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '课程标题',
   `subtitle` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '课程副标题',
-  `category_id` int NOT NULL COMMENT '分类ID',
-  `teacher_id` bigint NOT NULL COMMENT '教师ID',
+  `category_id` int(11) NOT NULL COMMENT '分类ID',
+  `teacher_id` bigint(20) NOT NULL COMMENT '教师ID',
   `cover_image` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '封面图片',
   `introduction` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '课程介绍',
   `objectives` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '学习目标',
-  `difficulty_level` tinyint NULL DEFAULT 1 COMMENT '难度等级 1-5',
-  `duration` int NULL DEFAULT NULL COMMENT '课程时长(分钟)',
+  `difficulty_level` tinyint(4) NULL DEFAULT 1 COMMENT '难度等级 1-5',
+  `duration` int(11) NULL DEFAULT NULL COMMENT '课程时长(分钟)',
   `price` decimal(10, 2) NULL DEFAULT 0.00 COMMENT '课程价格',
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'draft' COMMENT '状态',
-  `view_count` int NULL DEFAULT 0 COMMENT '观看次数',
-  `student_count` int NULL DEFAULT 0 COMMENT '学生数量',
+  `view_count` int(11) NULL DEFAULT 0 COMMENT '观看次数',
+  `student_count` int(11) NULL DEFAULT 0 COMMENT '学生数量',
   `rating` decimal(3, 1) NULL DEFAULT 0.0 COMMENT '评分',
   `tags` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '标签',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -77,7 +73,7 @@ CREATE TABLE `course`  (
   INDEX `idx_teacher`(`teacher_id` ASC) USING BTREE,
   CONSTRAINT `course_ibfk_1` FOREIGN KEY (`category_id`) REFERENCES `edu_categories` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `course_ibfk_2` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of course
@@ -91,17 +87,17 @@ INSERT INTO `course` VALUES (3, '中药材野外识别', '实地识别常用中�
 -- ----------------------------
 DROP TABLE IF EXISTS `course_chapter`;
 CREATE TABLE `course_chapter`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `course_id` bigint NOT NULL COMMENT '课程ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `course_id` bigint(20) NOT NULL COMMENT '课程ID',
   `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '章节标题',
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '章节描述',
-  `sort_order` int NULL DEFAULT 0 COMMENT '排序',
-  `duration` int NULL DEFAULT 0 COMMENT '时长',
+  `sort_order` int(11) NULL DEFAULT 0 COMMENT '排序',
+  `duration` int(11) NULL DEFAULT 0 COMMENT '时长',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_course`(`course_id` ASC) USING BTREE,
   CONSTRAINT `course_chapter_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程章节表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程章节表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of course_chapter
@@ -116,24 +112,24 @@ INSERT INTO `course_chapter` VALUES (4, 2, '补益剂', '补益剂的分类、�
 -- ----------------------------
 DROP TABLE IF EXISTS `course_lesson`;
 CREATE TABLE `course_lesson`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `chapter_id` bigint NOT NULL COMMENT '章节ID',
-  `course_id` bigint NOT NULL COMMENT '课程ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `chapter_id` bigint(20) NOT NULL COMMENT '章节ID',
+  `course_id` bigint(20) NOT NULL COMMENT '课程ID',
   `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '课时标题',
   `content_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '内容类型(video/document/quiz)',
   `content_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '内容地址',
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '文本内容',
-  `duration` int NULL DEFAULT 0 COMMENT '时长(秒)',
-  `sort_order` int NULL DEFAULT 0 COMMENT '排序',
-  `is_free` tinyint NULL DEFAULT 0 COMMENT '是否免费',
-  `view_count` int NULL DEFAULT 0 COMMENT '观看次数',
+  `duration` int(11) NULL DEFAULT 0 COMMENT '时长(秒)',
+  `sort_order` int(11) NULL DEFAULT 0 COMMENT '排序',
+  `is_free` tinyint(4) NULL DEFAULT 0 COMMENT '是否免费',
+  `view_count` int(11) NULL DEFAULT 0 COMMENT '观看次数',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_chapter`(`chapter_id` ASC) USING BTREE,
   INDEX `idx_course`(`course_id` ASC) USING BTREE,
   CONSTRAINT `course_lesson_ibfk_1` FOREIGN KEY (`chapter_id`) REFERENCES `course_chapter` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `course_lesson_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程课时表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程课时表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of course_lesson
@@ -147,11 +143,11 @@ INSERT INTO `course_lesson` VALUES (3, 3, 2, '麻黄汤的组成与功效', 'vid
 -- ----------------------------
 DROP TABLE IF EXISTS `course_note`;
 CREATE TABLE `course_note`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` bigint NOT NULL COMMENT '用户ID',
-  `lesson_id` bigint NOT NULL COMMENT '课时ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+  `lesson_id` bigint(20) NOT NULL COMMENT '课时ID',
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '笔记内容',
-  `timestamp` int NULL DEFAULT 0 COMMENT '视频时间点(秒)',
+  `timestamp` int(11) NULL DEFAULT 0 COMMENT '视频时间点(秒)',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
@@ -159,7 +155,7 @@ CREATE TABLE `course_note`  (
   INDEX `idx_user_lesson`(`user_id` ASC, `lesson_id` ASC) USING BTREE,
   CONSTRAINT `course_note_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `course_note_ibfk_2` FOREIGN KEY (`lesson_id`) REFERENCES `course_lesson` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程笔记表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '课程笔记表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of course_note
@@ -173,7 +169,7 @@ INSERT INTO `course_note` VALUES (3, 109, 3, '麻黄汤：麻黄、桂枝、杏�
 -- ----------------------------
 DROP TABLE IF EXISTS `disease`;
 CREATE TABLE `disease`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '疾病名称',
   `code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '疾病编码',
   `category` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '疾病分类',
@@ -188,7 +184,7 @@ CREATE TABLE `disease`  (
   INDEX `idx_name`(`name` ASC) USING BTREE,
   INDEX `idx_code`(`code` ASC) USING BTREE,
   INDEX `idx_category`(`category` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '疾病信息表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '疾病信息表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of disease
@@ -202,7 +198,7 @@ INSERT INTO `disease` VALUES (3, '风热感冒', 'J00.001', '外感病', '发热
 -- ----------------------------
 DROP TABLE IF EXISTS `edu_categories`;
 CREATE TABLE `edu_categories`  (
-  `id` int NOT NULL AUTO_INCREMENT COMMENT '分类主键ID',
+  `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '分类主键ID',
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类名称 (如: 试验课程, 课题研究)',
   `slug` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '分类别名 (用于URL, e.g., experiment-course)',
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '分类描述',
@@ -222,10 +218,10 @@ INSERT INTO `edu_categories` VALUES (3, '培训素材', 'training-material', NUL
 -- ----------------------------
 DROP TABLE IF EXISTS `edu_resource_video_link`;
 CREATE TABLE `edu_resource_video_link`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '关联主键ID',
-  `resource_id` bigint NOT NULL COMMENT '外键：教学资源ID',
-  `video_id` bigint NOT NULL COMMENT '外键：教学视频ID',
-  `display_order` int NOT NULL DEFAULT 0 COMMENT '显示顺序 (用于课程章节排序)',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '关联主键ID',
+  `resource_id` bigint(20) NOT NULL COMMENT '外键：教学资源ID',
+  `video_id` bigint(20) NOT NULL COMMENT '外键：教学视频ID',
+  `display_order` int(11) NOT NULL DEFAULT 0 COMMENT '显示顺序 (用于课程章节排序)',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_resource_video`(`resource_id` ASC, `video_id` ASC) USING BTREE,
   INDEX `fk_link_video_id`(`video_id` ASC) USING BTREE,
@@ -242,10 +238,10 @@ CREATE TABLE `edu_resource_video_link`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `edu_resources`;
 CREATE TABLE `edu_resources`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '资源主键ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '资源主键ID',
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '资源标题',
-  `category_id` int NOT NULL COMMENT '外键：关联的分类ID',
-  `author_id` bigint NOT NULL COMMENT '外键：作者的用户ID',
+  `category_id` int(11) NOT NULL COMMENT '外键：关联的分类ID',
+  `author_id` bigint(20) NOT NULL COMMENT '外键：作者的用户ID',
   `cover_image_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '封面图片URL',
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '资源主体内容 (由富文本编辑器生成)',
   `status` enum('draft','published','archived') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft' COMMENT '状态 (draft-草稿, published-已发布, archived-已归档)',
@@ -277,13 +273,13 @@ INSERT INTO `edu_resources` VALUES (11, '小狗疾病也可以用中药医治', 
 -- ----------------------------
 DROP TABLE IF EXISTS `edu_videos`;
 CREATE TABLE `edu_videos`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '视频主键ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '视频主键ID',
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '视频标题',
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '视频简介',
   `video_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '视频文件URL (来自OSS)',
   `cover_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '视频封面URL (可选)',
-  `duration` int NULL DEFAULT 0 COMMENT '视频时长 (单位: 秒)',
-  `uploader_id` bigint NOT NULL COMMENT '外键：上传者的用户ID',
+  `duration` int(11) NULL DEFAULT 0 COMMENT '视频时长 (单位: 秒)',
+  `uploader_id` bigint(20) NOT NULL COMMENT '外键：上传者的用户ID',
   `status` enum('draft','published','archived') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'draft' COMMENT '状态 (draft-草稿, published-已发布, archived-已归档)',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '上传时间',
   PRIMARY KEY (`id`) USING BTREE,
@@ -307,18 +303,18 @@ INSERT INTO `edu_videos` VALUES (11, '尖叫抛开', '哈哈哈哈', 'https://bi
 -- ----------------------------
 DROP TABLE IF EXISTS `evaluation_dimension`;
 CREATE TABLE `evaluation_dimension`  (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '维度名称',
   `code` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '维度代码',
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '维度描述',
   `weight` decimal(5, 2) NOT NULL COMMENT '权重',
-  `parent_id` int NULL DEFAULT 0 COMMENT '父级维度',
-  `sort_order` int NULL DEFAULT 0 COMMENT '排序',
-  `status` tinyint NULL DEFAULT 1 COMMENT '状态',
+  `parent_id` int(11) NULL DEFAULT 0 COMMENT '父级维度',
+  `sort_order` int(11) NULL DEFAULT 0 COMMENT '排序',
+  `status` tinyint(4) NULL DEFAULT 1 COMMENT '状态',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `code`(`code` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '评价维度表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '评价维度表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of evaluation_dimension
@@ -333,8 +329,8 @@ INSERT INTO `evaluation_dimension` VALUES (4, '创新发展', 'INNOVATION', '创
 -- ----------------------------
 DROP TABLE IF EXISTS `evaluation_indicator`;
 CREATE TABLE `evaluation_indicator`  (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `dimension_id` int NOT NULL COMMENT '所属维度ID',
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `dimension_id` int(11) NOT NULL COMMENT '所属维度ID',
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '指标名称',
   `code` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '指标代码',
   `data_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '数据类型',
@@ -343,14 +339,14 @@ CREATE TABLE `evaluation_indicator`  (
   `weight` decimal(5, 2) NOT NULL COMMENT '权重',
   `max_score` decimal(6, 2) NULL DEFAULT 100.00 COMMENT '最高分值',
   `scoring_rule` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '评分规则',
-  `auto_calculate` tinyint NULL DEFAULT 0 COMMENT '是否自动计算',
-  `sort_order` int NULL DEFAULT 0 COMMENT '排序',
-  `status` tinyint NULL DEFAULT 1 COMMENT '状态',
+  `auto_calculate` tinyint(4) NULL DEFAULT 0 COMMENT '是否自动计算',
+  `sort_order` int(11) NULL DEFAULT 0 COMMENT '排序',
+  `status` tinyint(4) NULL DEFAULT 1 COMMENT '状态',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_dimension`(`dimension_id` ASC) USING BTREE,
   CONSTRAINT `evaluation_indicator_ibfk_1` FOREIGN KEY (`dimension_id`) REFERENCES `evaluation_dimension` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '评价指标表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '评价指标表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of evaluation_indicator
@@ -371,18 +367,18 @@ INSERT INTO `evaluation_indicator` VALUES (10, 4, '专利成果', 'PATENTS', 'nu
 -- ----------------------------
 DROP TABLE IF EXISTS `evaluation_period`;
 CREATE TABLE `evaluation_period`  (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '周期名称',
   `period_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '周期类型',
   `start_date` date NOT NULL COMMENT '开始日期',
   `end_date` date NOT NULL COMMENT '结束日期',
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'active' COMMENT '状态',
   `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '描述',
-  `created_by` bigint NULL DEFAULT NULL COMMENT '创建人',
+  `created_by` bigint(20) NULL DEFAULT NULL COMMENT '创建人',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_dates`(`start_date` ASC, `end_date` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '评价周期表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '评价周期表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of evaluation_period
@@ -395,155 +391,223 @@ INSERT INTO `evaluation_period` VALUES (3, '2024年第三季度科研评价', 'q
 -- Table structure for formula
 -- ----------------------------
 DROP TABLE IF EXISTS `formula`;
-CREATE TABLE `formula` (
-    `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-    `name` VARCHAR(100) NOT NULL COMMENT '方剂名称',
-    `alias` VARCHAR(200) COMMENT '别名',
-    `source` VARCHAR(100) COMMENT '出处典籍',
-    `dynasty` VARCHAR(50) COMMENT '朝代',
-    `author` VARCHAR(100) COMMENT '创方人',
-    `category_id` INT COMMENT '分类ID',
-    `composition` TEXT COMMENT '药物组成',
-    `preparation` TEXT COMMENT '制法',
-    `usage` TEXT COMMENT '用法',
-    `dosage_form` VARCHAR(50) COMMENT '剂型',
-    `function_effect` TEXT COMMENT '功用',
-    `main_treatment` TEXT COMMENT '主治',
-    `clinical_application` TEXT COMMENT '临床应用',
-    `pharmacological_action` TEXT COMMENT '药理作用',
-    `contraindication` TEXT COMMENT '禁忌',
-    `caution` TEXT COMMENT '注意事项',
-    `modern_research` TEXT COMMENT '现代研究',
-    `remarks` TEXT COMMENT '备注',
-    `status` TINYINT DEFAULT 1 COMMENT '状态 1-正常 0-禁用',
-    `created_by` BIGINT COMMENT '创建人',
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX `idx_name` (`name`),
-    INDEX `idx_source` (`source`),
-    INDEX `idx_category` (`category_id`)
-) COMMENT '方剂基本信息表';
+CREATE TABLE `formula`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '方剂名称',
+  `alias` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '别名',
+  `source` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '出处典籍',
+  `dynasty` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '朝代',
+  `author` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '创方人',
+  `category_id` int(11) NULL DEFAULT NULL COMMENT '分类ID',
+  `composition` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '药物组成',
+  `preparation` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '制法',
+  `usage` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '用法',
+  `dosage_form` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '剂型',
+  `function_effect` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '功用',
+  `main_treatment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '主治',
+  `clinical_application` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '临床应用',
+  `pharmacological_action` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '药理作用',
+  `contraindication` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '禁忌',
+  `caution` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '注意事项',
+  `modern_research` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '现代研究',
+  `remarks` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '备注',
+  `status` tinyint(4) NULL DEFAULT 1 COMMENT '状态 1-正常 0-禁用',
+  `created_by` bigint(20) NULL DEFAULT NULL COMMENT '创建人',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_name`(`name` ASC) USING BTREE,
+  INDEX `idx_source`(`source` ASC) USING BTREE,
+  INDEX `idx_category`(`category_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '方剂基本信息表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
--- Table structure for formula_category
+-- Records of formula
 -- ----------------------------
-DROP TABLE IF EXISTS `formula_category`;
-CREATE TABLE `formula_category` (
-    `id` INT PRIMARY KEY AUTO_INCREMENT,
-    `name` VARCHAR(50) NOT NULL COMMENT '分类名称',
-    `parent_id` INT DEFAULT 0 COMMENT '父级分类ID',
-    `sort_order` INT DEFAULT 0 COMMENT '排序',
-    `description` TEXT COMMENT '分类描述',
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) COMMENT '方剂分类表';
-
--- ----------------------------
--- Table structure for formula_herb
--- ----------------------------
-DROP TABLE IF EXISTS `formula_herb`;
-CREATE TABLE `formula_herb` (
-    `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-    `formula_id` BIGINT NOT NULL COMMENT '方剂ID',
-    `herb_id` BIGINT NOT NULL COMMENT '药材ID',
-    `herb_name` VARCHAR(50) NOT NULL COMMENT '药材名称',
-    `dosage` VARCHAR(20) COMMENT '用量',
-    `unit` VARCHAR(10) COMMENT '单位',
-    `role` VARCHAR(20) COMMENT '配伍作用(君臣佐使)',
-    `processing` VARCHAR(50) COMMENT '炮制方法',
-    `usage_note` TEXT COMMENT '用法备注',
-    `sort_order` INT DEFAULT 0 COMMENT '排序',
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`formula_id`) REFERENCES `formula`(`id`) ON DELETE CASCADE,
-    INDEX `idx_formula` (`formula_id`),
-    INDEX `idx_herb` (`herb_id`)
-) COMMENT '方剂药物组成表';
-
--- ----------------------------
--- Table structure for formula_disease
--- ----------------------------
-DROP TABLE IF EXISTS `formula_disease`;
-CREATE TABLE `formula_disease` (
-    `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-    `formula_id` BIGINT NOT NULL COMMENT '方剂ID',
-    `disease_name` VARCHAR(100) NOT NULL COMMENT '疾病名称',
-    `disease_code` VARCHAR(50) COMMENT '疾病编码',
-    `syndrome` VARCHAR(200) COMMENT '证候',
-    `efficacy_level` TINYINT COMMENT '疗效等级 1-5',
-    `evidence_level` VARCHAR(20) COMMENT '循证等级',
-    `clinical_data` TEXT COMMENT '临床数据',
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`formula_id`) REFERENCES `formula`(`id`) ON DELETE CASCADE,
-    INDEX `idx_formula` (`formula_id`),
-    INDEX `idx_disease` (`disease_name`)
-) COMMENT '方剂主治疾病关联表';
-
--- ----------------------------
--- Table structure for formula_modification
--- ----------------------------
-DROP TABLE IF EXISTS `formula_modification`;
-CREATE TABLE `formula_modification` (
-    `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-    `base_formula_id` BIGINT NOT NULL COMMENT '基础方剂ID',
-    `modified_name` VARCHAR(100) COMMENT '加减方名称',
-    `modification_type` VARCHAR(20) COMMENT '变化类型(加味、减味、药量调整)',
-    `condition_description` TEXT COMMENT '适应条件',
-    `herb_changes` TEXT COMMENT '药物变化详情',
-    `effect_changes` TEXT COMMENT '功效变化',
-    `created_by` BIGINT COMMENT '创建人',
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`base_formula_id`) REFERENCES `formula`(`id`) ON DELETE CASCADE
-) COMMENT '方剂加减变化表';
+INSERT INTO `formula` VALUES (1, '麻黄汤', NULL, '伤寒论', '汉代', '张仲景', 1, '麻黄、桂枝、杏仁、甘草', '上四味，以水九升，先煮麻黄，减二升，去上沫，内诸药，煮取二升半，去滓，温服八合。', '温服，服后取微汗。', '汤剂', '发汗解表，宣肺平喘', '外感风寒表实证。症见恶寒发热，头身疼痛，无汗而喘，舌苔薄白，脉浮紧。', NULL, NULL, NULL, NULL, NULL, NULL, 1, 101, '2025-07-07 19:10:33', '2025-07-07 19:10:33');
+INSERT INTO `formula` VALUES (2, '四君子汤', '四君汤', '太平惠民和剂局方', '宋代', '陈师文', 2, '人参、白术、茯苓、炙甘草', '上为末，每服二钱，水一盏，煎至七分，通口服，不拘时候。', '水煎服。', '汤剂', '益气健脾', '脾胃气虚证。面色萎黄，语声低微，气短乏力，食少便溏，舌淡苔白，脉虚弱。', NULL, NULL, NULL, NULL, NULL, NULL, 1, 101, '2025-07-07 19:10:33', '2025-07-07 19:10:33');
+INSERT INTO `formula` VALUES (3, '血府逐瘀汤', NULL, '医林改错', '清代', '王清任', 3, '桃仁、红花、当归、生地黄、牛膝、川芎、桔梗、赤芍、枳壳、甘草、柴胡', '水煎服', '每日一剂，分两次温服。', '汤剂', '活血化瘀，行气止痛', '胸中血瘀证。胸痛，头痛，日久不愈，痛如针刺而有定处，或呃逆日久不止，或饮水即呛，干呕，或内热瞀闷，心悸失眠，急躁易怒，入暮潮热，唇暗或两目暗黑，舌质暗红，或舌有瘀斑、瘀点，脉涩或弦紧。', NULL, NULL, NULL, NULL, NULL, NULL, 1, 101, '2025-07-07 19:10:33', '2025-07-07 19:10:33');
+INSERT INTO `formula` VALUES (4, '银翘散', NULL, '温病条辨', '清代', '吴鞠通', 4, '金银花、连翘、苦桔梗、薄荷、竹叶、生甘草、荆芥穗、淡豆豉、牛蒡子', '上杵为散，每服六钱，鲜苇根汤煎，香气大出，即取服，勿过煎。', '苇根汤煎，温服。', '散剂/汤剂', '辛凉透表，清热解毒', '温病初起。发热，微恶风寒，无汗或有汗不畅，头痛口渴，咳嗽咽痛，舌尖红，苔薄白或薄黄，脉浮数。', NULL, NULL, NULL, NULL, NULL, NULL, 1, 101, '2025-07-07 19:10:33', '2025-07-07 19:10:33');
 
 -- ----------------------------
 -- Table structure for formula_case
 -- ----------------------------
 DROP TABLE IF EXISTS `formula_case`;
-CREATE TABLE `formula_case` (
-    `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-    `formula_id` BIGINT NOT NULL COMMENT '方剂ID',
-    `case_title` VARCHAR(200) COMMENT '医案标题',
-    `patient_info` TEXT COMMENT '患者信息',
-    `chief_complaint` TEXT COMMENT '主诉',
-    `history_present` TEXT COMMENT '现病史',
-    `physical_exam` TEXT COMMENT '体格检查',
-    `tongue_pulse` TEXT COMMENT '舌脉',
-    `tcm_diagnosis` TEXT COMMENT '中医诊断',
-    `treatment_principle` TEXT COMMENT '治法',
-    `prescription` TEXT COMMENT '处方',
-    `follow_up` TEXT COMMENT '随访记录',
-    `outcome` TEXT COMMENT '疗效',
-    `doctor_name` VARCHAR(50) COMMENT '医生姓名',
-    `hospital` VARCHAR(100) COMMENT '医院',
-    `case_date` DATE COMMENT '医案日期',
-    `source` VARCHAR(100) COMMENT '资料来源',
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`formula_id`) REFERENCES `formula`(`id`) ON DELETE CASCADE
-) COMMENT '方剂临床验案表';
+CREATE TABLE `formula_case`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `formula_id` bigint(20) NOT NULL COMMENT '方剂ID',
+  `case_title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '医案标题',
+  `patient_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '患者信息',
+  `chief_complaint` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '主诉',
+  `history_present` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '现病史',
+  `physical_exam` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '体格检查',
+  `tongue_pulse` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '舌脉',
+  `tcm_diagnosis` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '中医诊断',
+  `treatment_principle` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '治法',
+  `prescription` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '处方',
+  `follow_up` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '随访记录',
+  `outcome` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '疗效',
+  `doctor_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '医生姓名',
+  `hospital` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '医院',
+  `case_date` date NULL DEFAULT NULL COMMENT '医案日期',
+  `source` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '资料来源',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `formula_id`(`formula_id` ASC) USING BTREE,
+  CONSTRAINT `formula_case_ibfk_1` FOREIGN KEY (`formula_id`) REFERENCES `formula` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '方剂临床验案表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of formula_case
+-- ----------------------------
+INSERT INTO `formula_case` VALUES (1, 3, '王某某，头痛案', '患者，男，45岁', '反复性头痛五年，痛如针刺，部位固定', '患者五年前无明显诱因出现头痛，呈持续性刺痛，位于左侧巅顶，每因情绪激动或劳累后加重。曾多方求医，效果不佳。近一月疼痛加剧，伴有心烦易怒，夜寐不安。', NULL, NULL, '头痛（瘀血头痛）', '活血化瘀，行气止痛', '血府逐瘀汤原方，七剂', NULL, '服药七剂后，头痛明显减轻，睡眠改善。继续调理半月，头痛基本消失，随访半年未复发。', '李医生', NULL, '2023-05-10', NULL, '2025-07-07 19:10:33');
+
+-- ----------------------------
+-- Table structure for formula_category
+-- ----------------------------
+DROP TABLE IF EXISTS `formula_category`;
+CREATE TABLE `formula_category`  (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '分类名称',
+  `parent_id` int(11) NULL DEFAULT 0 COMMENT '父级分类ID',
+  `sort_order` int(11) NULL DEFAULT 0 COMMENT '排序',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '分类描述',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '方剂分类表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of formula_category
+-- ----------------------------
+INSERT INTO `formula_category` VALUES (1, '解表剂', 0, 0, '用于治疗表证的方剂', '2025-07-07 19:10:33');
+INSERT INTO `formula_category` VALUES (2, '补益剂', 0, 0, '用于补益气血阴阳的方剂', '2025-07-07 19:10:33');
+INSERT INTO `formula_category` VALUES (3, '理血剂', 0, 0, '用于理血调血的方剂', '2025-07-07 19:10:33');
+INSERT INTO `formula_category` VALUES (4, '清热剂', 0, 0, '用于清热解毒的方剂', '2025-07-07 19:10:33');
+
+-- ----------------------------
+-- Table structure for formula_disease
+-- ----------------------------
+DROP TABLE IF EXISTS `formula_disease`;
+CREATE TABLE `formula_disease`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `formula_id` bigint(20) NOT NULL COMMENT '方剂ID',
+  `disease_id` bigint(100) NOT NULL COMMENT '疾病名称',
+  `disease_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '疾病编码',
+  `syndrome` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '证候',
+  `efficacy_level` tinyint(4) NULL DEFAULT NULL COMMENT '疗效等级 1-5',
+  `evidence_level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '循证等级',
+  `clinical_data` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '临床数据',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_formula`(`formula_id` ASC) USING BTREE,
+  INDEX `idx_disease`(`disease_id` ASC) USING BTREE,
+  CONSTRAINT `formula_disease_ibfk_1` FOREIGN KEY (`formula_id`) REFERENCES `formula` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `formula_disease_ibfk_2` FOREIGN KEY (`disease_id`) REFERENCES `disease` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '方剂主治疾病关联表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of formula_disease
+-- ----------------------------
+INSERT INTO `formula_disease` VALUES (1, 1, 1, 'J00.001', '风寒束表，肺气不宣证', 5, NULL, NULL, '2025-07-07 19:10:33');
+INSERT INTO `formula_disease` VALUES (2, 2, 2, 'K59.001', '脾胃气虚证', 5, NULL, NULL, '2025-07-07 19:10:33');
+INSERT INTO `formula_disease` VALUES (3, 3, 3, 'I20.001', '气滞血瘀证', 5, NULL, NULL, '2025-07-07 19:10:33');
+INSERT INTO `formula_disease` VALUES (4, 3, 1, 'G44.001', '瘀血头痛', 4, NULL, NULL, '2025-07-07 19:10:33');
+INSERT INTO `formula_disease` VALUES (5, 4, 2, 'J00.002', '风热犯卫证', 5, NULL, NULL, '2025-07-07 19:10:33');
 
 -- ----------------------------
 -- Table structure for formula_evaluation
 -- ----------------------------
 DROP TABLE IF EXISTS `formula_evaluation`;
-CREATE TABLE `formula_evaluation` (
-    `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-    `formula_id` BIGINT NOT NULL COMMENT '方剂ID',
-    `evaluator_id` BIGINT COMMENT '评价人ID',
-    `evaluation_type` VARCHAR(20) COMMENT '评价类型(临床疗效、安全性、经济性)',
-    `score` DECIMAL(3,1) COMMENT '评分',
-    `evaluation_content` TEXT COMMENT '评价内容',
-    `evidence_files` TEXT COMMENT '证据文件',
-    `evaluation_date` DATE COMMENT '评价日期',
-    `status` VARCHAR(20) DEFAULT 'pending' COMMENT '状态',
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (`formula_id`) REFERENCES `formula`(`id`) ON DELETE CASCADE
-) COMMENT '方剂评价表';
+CREATE TABLE `formula_evaluation`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `formula_id` bigint(20) NOT NULL COMMENT '方剂ID',
+  `evaluator_id` bigint(20) NULL DEFAULT NULL COMMENT '评价人ID',
+  `evaluation_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '评价类型(临床疗效、安全性、经济性)',
+  `score` decimal(3, 1) NULL DEFAULT NULL COMMENT '评分',
+  `evaluation_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '评价内容',
+  `evidence_files` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '证据文件',
+  `evaluation_date` date NULL DEFAULT NULL COMMENT '评价日期',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'pending' COMMENT '状态',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `formula_id`(`formula_id` ASC) USING BTREE,
+  CONSTRAINT `formula_evaluation_ibfk_1` FOREIGN KEY (`formula_id`) REFERENCES `formula` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '方剂评价表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of formula_evaluation
+-- ----------------------------
+INSERT INTO `formula_evaluation` VALUES (1, 2, 108, '临床疗效', 4.8, '我母亲脾胃虚弱，食欲不振，服用四君子汤加减化裁后，食欲明显改善，精神状态也好了很多，是健脾益气良方。', NULL, NULL, 'approved', '2025-07-07 19:10:33');
+
+-- ----------------------------
+-- Table structure for formula_herb
+-- ----------------------------
+DROP TABLE IF EXISTS `formula_herb`;
+CREATE TABLE `formula_herb`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `formula_id` bigint(20) NOT NULL COMMENT '方剂ID',
+  `herb_id` bigint(20) NOT NULL COMMENT '药材ID',
+  `herb_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '药材名称',
+  `dosage` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用量',
+  `unit` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '单位',
+  `role` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '配伍作用(君臣佐使)',
+  `processing` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '炮制方法',
+  `usage_note` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '用法备注',
+  `sort_order` int(11) NULL DEFAULT 0 COMMENT '排序',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_formula`(`formula_id` ASC) USING BTREE,
+  INDEX `idx_herb`(`herb_id` ASC) USING BTREE,
+  CONSTRAINT `formula_herb_ibfk_1` FOREIGN KEY (`formula_id`) REFERENCES `formula` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '方剂药物组成表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of formula_herb
+-- ----------------------------
+INSERT INTO `formula_herb` VALUES (1, 1, 10, '麻黄', '9', 'g', '君药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (2, 1, 11, '桂枝', '6', 'g', '臣药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (3, 1, 12, '杏仁', '9', 'g', '佐药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (4, 1, 13, '炙甘草', '3', 'g', '使药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (5, 2, 1, '人参', '9', 'g', '君药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (6, 2, 14, '白术', '9', 'g', '臣药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (7, 2, 15, '茯苓', '9', 'g', '佐药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (8, 2, 13, '炙甘草', '6', 'g', '使药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (9, 3, 20, '桃仁', '12', 'g', '臣药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (10, 3, 21, '红花', '9', 'g', '臣药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (11, 3, 3, '当归', '9', 'g', '君药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (12, 3, 22, '生地黄', '9', 'g', '佐药', NULL, NULL, 0, '2025-07-07 19:10:33');
+INSERT INTO `formula_herb` VALUES (13, 3, 23, '川芎', '5', 'g', '佐药', NULL, NULL, 0, '2025-07-07 19:10:33');
+
+-- ----------------------------
+-- Table structure for formula_modification
+-- ----------------------------
+DROP TABLE IF EXISTS `formula_modification`;
+CREATE TABLE `formula_modification`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `base_formula_id` bigint(20) NOT NULL COMMENT '基础方剂ID',
+  `modified_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '加减方名称',
+  `modification_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '变化类型(加味、减味、药量调整)',
+  `condition_description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '适应条件',
+  `herb_changes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '药物变化详情',
+  `effect_changes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '功效变化',
+  `created_by` bigint(20) NULL DEFAULT NULL COMMENT '创建人',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `base_formula_id`(`base_formula_id` ASC) USING BTREE,
+  CONSTRAINT `formula_modification_ibfk_1` FOREIGN KEY (`base_formula_id`) REFERENCES `formula` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '方剂加减变化表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of formula_modification
+-- ----------------------------
+INSERT INTO `formula_modification` VALUES (1, 1, '三拗汤', '减味', '适用于外感风寒，肺气不宣之咳嗽声重，痰涕清稀，鼻塞，恶寒发热，无汗，头痛，苔薄白，脉浮紧。', '麻黄汤去桂枝', NULL, NULL, '2025-07-07 19:10:33');
 
 -- ----------------------------
 -- Table structure for herb
 -- ----------------------------
 DROP TABLE IF EXISTS `herb`;
 CREATE TABLE `herb`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
   `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '药材名称',
   `scientific_name` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '学名',
   `family_name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '科名',
@@ -623,8 +687,8 @@ INSERT INTO `herb` VALUES (58, '毛鹊树(变种)', 'Cotinus coggygria Scop. var
 -- ----------------------------
 DROP TABLE IF EXISTS `herb_growth_data`;
 CREATE TABLE `herb_growth_data`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `location_id` bigint NOT NULL COMMENT '外键：关联的观测点ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `location_id` bigint(20) NOT NULL COMMENT '外键：关联的观测点ID',
   `metric_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '指标名称 (如: 产量, 平均株高)',
   `metric_value` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '指标值',
   `metric_unit` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '指标单位 (如: 公斤, 厘米)',
@@ -643,9 +707,9 @@ CREATE TABLE `herb_growth_data`  (
 -- ----------------------------
 DROP TABLE IF EXISTS `herb_growth_data_history`;
 CREATE TABLE `herb_growth_data_history`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '历史记录主键ID',
-  `origin_id` bigint NOT NULL COMMENT '原数据表的主键ID',
-  `location_id` bigint NOT NULL COMMENT '关联的观测点ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '历史记录主键ID',
+  `origin_id` bigint(20) NOT NULL COMMENT '原数据表的主键ID',
+  `location_id` bigint(20) NOT NULL COMMENT '关联的观测点ID',
   `metric_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '指标名称',
   `old_value` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '变更前的值',
   `new_value` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '变更后的值',
@@ -671,9 +735,9 @@ INSERT INTO `herb_growth_data_history` VALUES (4, 3, 14, '含糖量', '45', '46'
 -- ----------------------------
 DROP TABLE IF EXISTS `herb_image`;
 CREATE TABLE `herb_image`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `herb_id` bigint NOT NULL COMMENT '外键：关联的药材ID',
-  `location_id` bigint NULL DEFAULT NULL COMMENT '【可选】外键：关联的观测点ID，用于现场实拍图',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `herb_id` bigint(20) NOT NULL COMMENT '外键：关联的药材ID',
+  `location_id` bigint(20) NULL DEFAULT NULL COMMENT '【可选】外键：关联的观测点ID，用于现场实拍图',
   `url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '图片地址URL',
   `is_primary` tinyint(1) NULL DEFAULT 0 COMMENT '是否为主图 (0-否, 1-是)',
   `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '图片描述',
@@ -751,15 +815,15 @@ INSERT INTO `herb_image` VALUES (83, 34, 85, 'https://biomedinfo.oss-cn-beijing.
 -- Table structure for herb_location
 -- ----------------------------
 DROP TABLE IF EXISTS `herb_location`;
-CREATE TABLE `herb_location` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID, 代表一次唯一的观测记录',
-  `herb_id` bigint NOT NULL COMMENT '外键：关联的药材ID',
+CREATE TABLE `herb_location`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键ID, 代表一次唯一的观测记录',
+  `herb_id` bigint(20) NOT NULL COMMENT '外键：关联的药材ID',
   `longitude` decimal(10, 7) NOT NULL COMMENT '经度 (e.g., 116.404269)',
   `latitude` decimal(10, 7) NOT NULL COMMENT '纬度 (e.g., 39.913169)',
   `province` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '省份',
   `city` varchar(32) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '城市',
   `address` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '详细地址/地名',
-  `observation_year` int NOT NULL COMMENT '观测/采集年份',
+  `observation_year` int(11) NOT NULL COMMENT '观测/采集年份',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '记录创建时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_herb_id`(`herb_id` ASC) USING BTREE,
@@ -834,21 +898,21 @@ INSERT INTO `herb_location` VALUES (85, 34, 121.6147860, 38.9139620, '辽宁省'
 -- ----------------------------
 DROP TABLE IF EXISTS `indicator_score`;
 CREATE TABLE `indicator_score`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `evaluation_id` bigint NOT NULL COMMENT '评价记录ID',
-  `indicator_id` int NOT NULL COMMENT '指标ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `evaluation_id` bigint(20) NOT NULL COMMENT '评价记录ID',
+  `indicator_id` int(11) NOT NULL COMMENT '指标ID',
   `original_value` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '原始数值',
   `score` decimal(6, 2) NULL DEFAULT 0.00 COMMENT '得分',
   `evidence_files` json NULL COMMENT '佐证材料',
   `evaluator_comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '评价说明',
-  `auto_calculated` tinyint NULL DEFAULT 0 COMMENT '是否自动计算',
+  `auto_calculated` tinyint(4) NULL DEFAULT 0 COMMENT '是否自动计算',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_evaluation_indicator`(`evaluation_id` ASC, `indicator_id` ASC) USING BTREE,
   INDEX `indicator_id`(`indicator_id` ASC) USING BTREE,
   CONSTRAINT `indicator_score_ibfk_1` FOREIGN KEY (`evaluation_id`) REFERENCES `user_evaluation` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `indicator_score_ibfk_2` FOREIGN KEY (`indicator_id`) REFERENCES `evaluation_indicator` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '指标得分详情表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '指标得分详情表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of indicator_score
@@ -864,7 +928,7 @@ INSERT INTO `indicator_score` VALUES (5, 2, 2, '4.6', 92.00, NULL, '学生评教
 -- ----------------------------
 DROP TABLE IF EXISTS `knowledge_base`;
 CREATE TABLE `knowledge_base`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '标题',
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '内容',
   `content_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '内容类型',
@@ -872,16 +936,16 @@ CREATE TABLE `knowledge_base`  (
   `tags` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '标签',
   `source_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '来源URL',
   `embedding_vector` json NULL COMMENT '向量表示',
-  `view_count` int NULL DEFAULT 0 COMMENT '查看次数',
+  `view_count` int(11) NULL DEFAULT 0 COMMENT '查看次数',
   `relevance_score` decimal(5, 3) NULL DEFAULT 0.000 COMMENT '相关性得分',
-  `created_by` bigint NULL DEFAULT NULL COMMENT '创建人',
+  `created_by` bigint(20) NULL DEFAULT NULL COMMENT '创建人',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_category`(`category` ASC) USING BTREE,
   INDEX `idx_created_by`(`created_by` ASC) USING BTREE,
   FULLTEXT INDEX `ft_content`(`title`, `content`, `tags`)
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '知识库条目表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '知识库条目表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of knowledge_base
@@ -895,17 +959,17 @@ INSERT INTO `knowledge_base` VALUES (3, '中医四诊客观化研究现状', '�
 -- ----------------------------
 DROP TABLE IF EXISTS `literature`;
 CREATE TABLE `literature`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `title` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '文献标题',
   `authors` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '作者',
   `publication` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '期刊名称',
-  `publish_year` int NULL DEFAULT NULL COMMENT '发表年份',
+  `publish_year` int(11) NULL DEFAULT NULL COMMENT '发表年份',
   `doi` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'DOI',
   `abstract` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '摘要',
   `keywords` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '关键词',
   `research_field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '研究领域',
   `impact_factor` decimal(6, 3) NULL DEFAULT NULL COMMENT '影响因子',
-  `citation_count` int NULL DEFAULT 0 COMMENT '引用次数',
+  `citation_count` int(11) NULL DEFAULT 0 COMMENT '引用次数',
   `pdf_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'PDF地址',
   `source` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '来源',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -913,7 +977,7 @@ CREATE TABLE `literature`  (
   INDEX `idx_title`(`title`(100) ASC) USING BTREE,
   INDEX `idx_year`(`publish_year` ASC) USING BTREE,
   INDEX `idx_field`(`research_field` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '文献资料表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '文献资料表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of literature
@@ -927,8 +991,8 @@ INSERT INTO `literature` VALUES (3, '中药网络药理学研究方法与应用�
 -- ----------------------------
 DROP TABLE IF EXISTS `operation_log`;
 CREATE TABLE `operation_log`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` bigint NULL DEFAULT NULL COMMENT '操作用户ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NULL DEFAULT NULL COMMENT '操作用户ID',
   `operation` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '操作名称',
   `module` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '模块名称',
   `request_method` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '请求方法',
@@ -936,7 +1000,7 @@ CREATE TABLE `operation_log`  (
   `request_params` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '请求参数',
   `ip_address` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT 'IP地址',
   `user_agent` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '用户代理',
-  `execution_time` int NULL DEFAULT NULL COMMENT '执行时间(毫秒)',
+  `execution_time` int(11) NULL DEFAULT NULL COMMENT '执行时间(毫秒)',
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '操作状态',
   `error_msg` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '错误信息',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
@@ -944,7 +1008,7 @@ CREATE TABLE `operation_log`  (
   INDEX `idx_user`(`user_id` ASC) USING BTREE,
   INDEX `idx_module`(`module` ASC) USING BTREE,
   INDEX `idx_created`(`created_at` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '操作日志表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of operation_log
@@ -959,8 +1023,8 @@ INSERT INTO `operation_log` VALUES (4, 1, '用户评价审核', 'evaluation', 'P
 -- ----------------------------
 DROP TABLE IF EXISTS `performance_data`;
 CREATE TABLE `performance_data`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
   `data_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '数据类型',
   `data_key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '数据键',
   `data_value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '数据值',
@@ -972,7 +1036,7 @@ CREATE TABLE `performance_data`  (
   INDEX `idx_user_type`(`user_id` ASC, `data_type` ASC) USING BTREE,
   INDEX `idx_user_date`(`user_id` ASC, `data_date` ASC) USING BTREE,
   CONSTRAINT `performance_data_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '业绩数据表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '业绩数据表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of performance_data
@@ -989,9 +1053,9 @@ INSERT INTO `performance_data` VALUES (6, 109, 'INNOVATION', 'patent_count', '2'
 -- ----------------------------
 DROP TABLE IF EXISTS `project_member`;
 CREATE TABLE `project_member`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `project_id` bigint NOT NULL COMMENT '项目ID',
-  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `project_id` bigint(20) NOT NULL COMMENT '项目ID',
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
   `role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '角色',
   `contribution_rate` decimal(5, 2) NULL DEFAULT NULL COMMENT '贡献度百分比',
   `join_date` date NULL DEFAULT NULL COMMENT '加入日期',
@@ -1002,7 +1066,7 @@ CREATE TABLE `project_member`  (
   INDEX `user_id`(`user_id` ASC) USING BTREE,
   CONSTRAINT `project_member_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `research_project` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `project_member_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '项目参与人员表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '项目参与人员表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of project_member
@@ -1018,62 +1082,61 @@ INSERT INTO `project_member` VALUES (5, 2, 110, 'researcher', 30.00, '2023-07-01
 -- ----------------------------
 DROP TABLE IF EXISTS `research_achievement`;
 CREATE TABLE `research_achievement`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `project_id` bigint NULL DEFAULT NULL COMMENT '关联项目ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `project_id` bigint(20) NULL DEFAULT NULL COMMENT '关联项目ID',
   `achievement_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '成果类型',
   `title` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '成果标题',
   `authors` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '作者',
   `publication` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '发表期刊/出版社',
   `publish_date` date NULL DEFAULT NULL COMMENT '发表日期',
   `impact_factor` decimal(5, 3) NULL DEFAULT NULL COMMENT '影响因子',
-  `citation_count` int NULL DEFAULT 0 COMMENT '引用次数',
+  `citation_count` int(11) NULL DEFAULT 0 COMMENT '引用次数',
   `doi` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT 'DOI',
   `abstract_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL COMMENT '摘要',
   `keywords` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '关键词',
   `file_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '文件地址',
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending' COMMENT '状态',
-  `created_by` bigint NULL DEFAULT NULL COMMENT '创建人',
+  `created_by` bigint(20) NULL DEFAULT NULL COMMENT '创建人',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_project_id`(`project_id` ASC) USING BTREE,
   INDEX `idx_achievement_type`(`achievement_type` ASC) USING BTREE,
   INDEX `idx_publish_date`(`publish_date` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '科研成果表(论文、专利等)' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '科研成果表(论文、专利等)' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of research_achievement
 -- ----------------------------
-INSERT INTO `research_achievement` (`project_id`, `achievement_type`, `title`, `authors`, `publication`, `publish_date`, `impact_factor`, `citation_count`, `doi`, `abstract_text`, `keywords`, `file_url`, `status`, `created_by`)
-VALUES
-(1, '论文', '小青龙汤治疗过敏性鼻炎的临床研究', '张三, 李四', '中华中医药杂志', '2023-05-10', 2.150, 15, '10.1000/xyz123', '目的：探讨小青龙汤治疗过敏性鼻炎的临床疗效。方法：选取100例过敏性鼻炎患者随机分为治疗组和对照组...', '小青龙汤, 过敏性鼻炎, 临床研究', 'http://example.com/paper1.pdf', 'approved', 1),
-(1, '论文', '桂枝汤加减治疗体虚感冒的系统评价', '王五, 赵六', '中国中药杂志', '2022-11-20', 3.450, 45, '10.1000/abc789', '目的：系统评价桂枝汤加减治疗体虚感冒的有效性及安全性。方法：检索多个数据库，收集相关随机对照试验进行Meta分析...', '桂枝汤, 体虚感冒, Meta分析', 'http://example.com/paper2.pdf', 'approved', 1),
-(2, '专利', '一种从黄芪中提取多糖的新工艺', '钱七', NULL, '2024-01-15', NULL, NULL, 'CN12345678A', '本发明公开了一种从黄芪中高效提取黄芪多糖的工艺方法，包括超声辅助提取、双水相萃取纯化等步骤...', '黄芪多糖, 提取工艺, 专利', 'http://example.com/patent1.pdf', 'approved', 2);
+INSERT INTO `research_achievement` VALUES (1, 1, '论文', '小青龙汤治疗过敏性鼻炎的临床研究', '张三, 李四', '中华中医药杂志', '2023-05-10', 2.150, 15, '10.1000/xyz123', '目的：探讨小青龙汤治疗过敏性鼻炎的临床疗效。方法：选取100例过敏性鼻炎患者随机分为治疗组和对照组...', '小青龙汤, 过敏性鼻炎, 临床研究', 'http://example.com/paper1.pdf', 'approved', 1, '2025-07-07 19:10:32');
+INSERT INTO `research_achievement` VALUES (2, 1, '论文', '桂枝汤加减治疗体虚感冒的系统评价', '王五, 赵六', '中国中药杂志', '2022-11-20', 3.450, 45, '10.1000/abc789', '目的：系统评价桂枝汤加减治疗体虚感冒的有效性及安全性。方法：检索多个数据库，收集相关随机对照试验进行Meta分析...', '桂枝汤, 体虚感冒, Meta分析', 'http://example.com/paper2.pdf', 'approved', 1, '2025-07-07 19:10:32');
+INSERT INTO `research_achievement` VALUES (3, 2, '专利', '一种从黄芪中提取多糖的新工艺', '钱七', NULL, '2024-01-15', NULL, NULL, 'CN12345678A', '本发明公开了一种从黄芪中高效提取黄芪多糖的工艺方法，包括超声辅助提取、双水相萃取纯化等步骤...', '黄芪多糖, 提取工艺, 专利', 'http://example.com/patent1.pdf', 'approved', 2, '2025-07-07 19:10:32');
 
 -- ----------------------------
 -- Table structure for research_project
 -- ----------------------------
 DROP TABLE IF EXISTS `research_project`;
-CREATE TABLE `research_project` (
-    `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
-    `project_name` VARCHAR(200) NOT NULL COMMENT '项目名称',
-    `project_code` VARCHAR(50) COMMENT '项目编号',
-    `project_type` VARCHAR(50) COMMENT '项目类型',
-    `funding_source` VARCHAR(100) COMMENT '资助来源',
-    `funding_amount` DECIMAL(12,2) COMMENT '资助金额',
-    `principal_investigator` BIGINT COMMENT '项目负责人ID',
-    `start_date` DATE COMMENT '开始日期',
-    `end_date` DATE COMMENT '结束日期',
-    `status` VARCHAR(20) DEFAULT 'active' COMMENT '状态',
-    `abstract_text` TEXT COMMENT '项目摘要',
-    `keywords` VARCHAR(500) COMMENT '关键词',
-    `research_field` VARCHAR(100) COMMENT '研究领域',
-    `achievements` TEXT COMMENT '项目成果',
-    `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    INDEX `idx_pi` (`principal_investigator`),
-    INDEX `idx_status` (`status`),
-    INDEX `idx_type` (`project_type`)
-) COMMENT '科研项目表';
+CREATE TABLE `research_project`  (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `project_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '项目名称',
+  `project_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '项目编号',
+  `project_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '项目类型',
+  `funding_source` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '资助来源',
+  `funding_amount` decimal(12, 2) NULL DEFAULT NULL COMMENT '资助金额',
+  `principal_investigator` bigint(20) NULL DEFAULT NULL COMMENT '项目负责人ID',
+  `start_date` date NULL DEFAULT NULL COMMENT '开始日期',
+  `end_date` date NULL DEFAULT NULL COMMENT '结束日期',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'active' COMMENT '状态',
+  `abstract_text` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '项目摘要',
+  `keywords` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '关键词',
+  `research_field` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '研究领域',
+  `achievements` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '项目成果',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_pi`(`principal_investigator` ASC) USING BTREE,
+  INDEX `idx_status`(`status` ASC) USING BTREE,
+  INDEX `idx_type`(`project_type` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '科研项目表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of research_project
@@ -1087,14 +1150,14 @@ INSERT INTO `research_project` VALUES (3, '人工智能在中医辨证论治中�
 -- ----------------------------
 DROP TABLE IF EXISTS `study_record`;
 CREATE TABLE `study_record`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` bigint NOT NULL COMMENT '用户ID',
-  `course_id` bigint NOT NULL COMMENT '课程ID',
-  `lesson_id` bigint NOT NULL COMMENT '课时ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID',
+  `course_id` bigint(20) NOT NULL COMMENT '课程ID',
+  `lesson_id` bigint(20) NOT NULL COMMENT '课时ID',
   `progress` decimal(5, 2) NULL DEFAULT 0.00 COMMENT '学习进度百分比',
-  `study_duration` int NULL DEFAULT 0 COMMENT '学习时长(秒)',
+  `study_duration` int(11) NULL DEFAULT 0 COMMENT '学习时长(秒)',
   `completed_at` timestamp NULL DEFAULT NULL COMMENT '完成时间',
-  `last_position` int NULL DEFAULT 0 COMMENT '最后观看位置(秒)',
+  `last_position` int(11) NULL DEFAULT 0 COMMENT '最后观看位置(秒)',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
@@ -1105,7 +1168,7 @@ CREATE TABLE `study_record`  (
   CONSTRAINT `study_record_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `study_record_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `study_record_ibfk_3` FOREIGN KEY (`lesson_id`) REFERENCES `course_lesson` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学习记录表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '学习记录表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of study_record
@@ -1120,18 +1183,18 @@ INSERT INTO `study_record` VALUES (4, 110, 1, 1, 45.30, 815, NULL, 815, '2025-07
 -- ----------------------------
 DROP TABLE IF EXISTS `system_config`;
 CREATE TABLE `system_config`  (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `config_key` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '配置键',
   `config_value` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '配置值',
   `config_type` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'string' COMMENT '配置类型',
   `description` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '配置描述',
   `group_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '配置分组',
-  `sort_order` int NULL DEFAULT 0 COMMENT '排序',
+  `sort_order` int(11) NULL DEFAULT 0 COMMENT '排序',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `config_key`(`config_key` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统配置表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '系统配置表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of system_config
@@ -1148,13 +1211,13 @@ INSERT INTO `system_config` VALUES (6, 'file.upload.max.size', '100', 'number', 
 -- ----------------------------
 DROP TABLE IF EXISTS `user_evaluation`;
 CREATE TABLE `user_evaluation`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` bigint NOT NULL COMMENT '被评价用户ID',
-  `period_id` int NOT NULL COMMENT '评价周期ID',
-  `evaluator_id` bigint NULL DEFAULT NULL COMMENT '评价人ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NOT NULL COMMENT '被评价用户ID',
+  `period_id` int(11) NOT NULL COMMENT '评价周期ID',
+  `evaluator_id` bigint(20) NULL DEFAULT NULL COMMENT '评价人ID',
   `total_score` decimal(8, 2) NULL DEFAULT 0.00 COMMENT '总分',
   `weighted_score` decimal(8, 2) NULL DEFAULT 0.00 COMMENT '加权总分',
-  `ranking` int NULL DEFAULT NULL COMMENT '排名',
+  `ranking` int(11) NULL DEFAULT NULL COMMENT '排名',
   `level` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '等级',
   `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'draft' COMMENT '状态',
   `submit_time` timestamp NULL DEFAULT NULL COMMENT '提交时间',
@@ -1166,7 +1229,7 @@ CREATE TABLE `user_evaluation`  (
   INDEX `period_id`(`period_id` ASC) USING BTREE,
   CONSTRAINT `user_evaluation_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `user_evaluation_ibfk_2` FOREIGN KEY (`period_id`) REFERENCES `evaluation_period` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户评价记录表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '用户评价记录表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user_evaluation
@@ -1181,7 +1244,7 @@ INSERT INTO `user_evaluation` VALUES (4, 110, 2, 1, 85.60, 82.40, 8, '良好', '
 -- ----------------------------
 DROP TABLE IF EXISTS `user_profiles`;
 CREATE TABLE `user_profiles`  (
-  `user_id` bigint NOT NULL COMMENT '用户ID, 外键关联users.id',
+  `user_id` bigint(20) NOT NULL COMMENT '用户ID, 外键关联users.id',
   `nickname` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '用户昵称',
   `avatar_url` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '头像URL',
   `gender` enum('male','female','unknown') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT 'unknown' COMMENT '性别',
@@ -1207,8 +1270,8 @@ INSERT INTO `user_profiles` VALUES (113, '尚思宇', NULL, 'unknown', NULL);
 -- ----------------------------
 DROP TABLE IF EXISTS `user_third_party_auths`;
 CREATE TABLE `user_third_party_auths`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `user_id` bigint NULL DEFAULT NULL,
+  `id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `user_id` bigint(20) NULL DEFAULT NULL,
   `provider` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'github',
   `provider_user_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
@@ -1226,7 +1289,7 @@ INSERT INTO `user_third_party_auths` VALUES (1, 107, 'github', '150018177');
 -- ----------------------------
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '用户主键ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '用户主键ID',
   `username` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户名',
   `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL COMMENT '邮箱',
   `role` tinyint(1) NOT NULL DEFAULT 1 COMMENT '角色 (0-管理员, 1-学生, 2-教师, 3-研究员)',
@@ -1257,11 +1320,11 @@ INSERT INTO `users` VALUES (113, '尚思宇', NULL, 0, '2025-07-01 10:04:04', '$
 -- ----------------------------
 DROP TABLE IF EXISTS `video_comments`;
 CREATE TABLE `video_comments`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '留言主键ID',
-  `video_id` bigint NOT NULL COMMENT '外键：教学视频ID',
-  `user_id` bigint NOT NULL COMMENT '外键：留言用户的ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '留言主键ID',
+  `video_id` bigint(20) NOT NULL COMMENT '外键：教学视频ID',
+  `user_id` bigint(20) NOT NULL COMMENT '外键：留言用户的ID',
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '留言内容',
-  `parent_id` bigint NULL DEFAULT NULL COMMENT '外键：回复的父留言ID',
+  `parent_id` bigint(20) NULL DEFAULT NULL COMMENT '外键：回复的父留言ID',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '留言时间',
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `fk_comment_video_id`(`video_id` ASC) USING BTREE,
@@ -1293,9 +1356,9 @@ INSERT INTO `video_comments` VALUES (12, 5, 109, '你好，我是乃龙', NULL, 
 -- ----------------------------
 DROP TABLE IF EXISTS `video_likes`;
 CREATE TABLE `video_likes`  (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '点赞主键ID',
-  `video_id` bigint NOT NULL COMMENT '外键：教学视频ID',
-  `user_id` bigint NOT NULL COMMENT '外键：点赞用户的ID',
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '点赞主键ID',
+  `video_id` bigint(20) NOT NULL COMMENT '外键：教学视频ID',
+  `user_id` bigint(20) NOT NULL COMMENT '外键：点赞用户的ID',
   `created_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '点赞时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_video_user_like`(`video_id` ASC, `user_id` ASC) USING BTREE,
@@ -1312,80 +1375,5 @@ INSERT INTO `video_likes` VALUES (4, 6, 109, '2025-07-02 13:49:33');
 INSERT INTO `video_likes` VALUES (6, 6, 108, '2025-07-02 19:17:29');
 INSERT INTO `video_likes` VALUES (7, 10, 112, '2025-07-03 17:34:09');
 INSERT INTO `video_likes` VALUES (8, 11, 109, '2025-07-03 18:31:09');
-
--- ----------------------------
--- Records for Formula Module
--- ----------------------------
-
--- 1. 插入方剂分类
-INSERT INTO `formula_category` (`id`, `name`, `parent_id`, `description`) VALUES
-(1, '解表剂', 0, '用于治疗表证的方剂'),
-(2, '补益剂', 0, '用于补益气血阴阳的方剂'),
-(3, '理血剂', 0, '用于理血调血的方剂'),
-(4, '清热剂', 0, '用于清热解毒的方剂');
-
--- 2. 插入方剂基本信息 (假设 category_id 与上面对应, created_by 假设为用户ID 101)
-INSERT INTO `formula` (`id`, `name`, `alias`, `source`, `dynasty`, `author`, `category_id`, `composition`, `preparation`, `usage`, `dosage_form`, `function_effect`, `main_treatment`, `status`, `created_by`) VALUES
-(1, '麻黄汤', NULL, '伤寒论', '汉代', '张仲景', 1, '麻黄、桂枝、杏仁、甘草', '上四味，以水九升，先煮麻黄，减二升，去上沫，内诸药，煮取二升半，去滓，温服八合。', '温服，服后取微汗。', '汤剂', '发汗解表，宣肺平喘', '外感风寒表实证。症见恶寒发热，头身疼痛，无汗而喘，舌苔薄白，脉浮紧。', 1, 101),
-(2, '四君子汤', '四君汤', '太平惠民和剂局方', '宋代', '陈师文', 2, '人参、白术、茯苓、炙甘草', '上为末，每服二钱，水一盏，煎至七分，通口服，不拘时候。', '水煎服。', '汤剂', '益气健脾', '脾胃气虚证。面色萎黄，语声低微，气短乏力，食少便溏，舌淡苔白，脉虚弱。', 1, 101),
-(3, '血府逐瘀汤', NULL, '医林改错', '清代', '王清任', 3, '桃仁、红花、当归、生地黄、牛膝、川芎、桔梗、赤芍、枳壳、甘草、柴胡', '水煎服', '每日一剂，分两次温服。', '汤剂', '活血化瘀，行气止痛', '胸中血瘀证。胸痛，头痛，日久不愈，痛如针刺而有定处，或呃逆日久不止，或饮水即呛，干呕，或内热瞀闷，心悸失眠，急躁易怒，入暮潮热，唇暗或两目暗黑，舌质暗红，或舌有瘀斑、瘀点，脉涩或弦紧。', 1, 101),
-(4, '银翘散', NULL, '温病条辨', '清代', '吴鞠通', 4, '金银花、连翘、苦桔梗、薄荷、竹叶、生甘草、荆芥穗、淡豆豉、牛蒡子', '上杵为散，每服六钱，鲜苇根汤煎，香气大出，即取服，勿过煎。', '苇根汤煎，温服。', '散剂/汤剂', '辛凉透表，清热解毒', '温病初起。发热，微恶风寒，无汗或有汗不畅，头痛口渴，咳嗽咽痛，舌尖红，苔薄白或薄黄，脉浮数。', 1, 101);
-
--- 3. 插入方剂-药物组成 (假设 herb_id 为药材表中的ID)
--- 麻黄汤 (formula_id = 1)
-INSERT INTO `formula_herb` (`formula_id`, `herb_id`, `herb_name`, `dosage`, `unit`, `role`) VALUES
-(1, 10, '麻黄', '9', 'g', '君药'),
-(1, 11, '桂枝', '6', 'g', '臣药'),
-(1, 12, '杏仁', '9', 'g', '佐药'),
-(1, 13, '炙甘草', '3', 'g', '使药');
--- 四君子汤 (formula_id = 2)
-INSERT INTO `formula_herb` (`formula_id`, `herb_id`, `herb_name`, `dosage`, `unit`, `role`) VALUES
-(2, 1, '人参', '9', 'g', '君药'),
-(2, 14, '白术', '9', 'g', '臣药'),
-(2, 15, '茯苓', '9', 'g', '佐药'),
-(2, 13, '炙甘草', '6', 'g', '使药');
--- 血府逐瘀汤 (formula_id = 3)
-INSERT INTO `formula_herb` (`formula_id`, `herb_id`, `herb_name`, `dosage`, `unit`, `role`) VALUES
-(3, 20, '桃仁', '12', 'g', '臣药'),
-(3, 21, '红花', '9', 'g', '臣药'),
-(3, 3, '当归', '9', 'g', '君药'),
-(3, 22, '生地黄', '9', 'g', '佐药'),
-(3, 23, '川芎', '5', 'g', '佐药');
-
--- 4. 插入方剂-主治疾病关联
-INSERT INTO `formula_disease` (`formula_id`, `disease_name`, `disease_code`, `syndrome`, `efficacy_level`) VALUES
-(1, '外感风寒', 'J00.001', '风寒束表，肺气不宣证', 5),
-(2, '脾胃虚弱', 'K59.001', '脾胃气虚证', 5),
-(3, '胸痹心痛', 'I20.001', '气滞血瘀证', 5),
-(3, '头痛', 'G44.001', '瘀血头痛', 4),
-(4, '风热感冒', 'J00.002', '风热犯卫证', 5);
-
--- 5. 插入方剂加减变化 (以麻黄汤为例)
-INSERT INTO `formula_modification` (`base_formula_id`, `modified_name`, `modification_type`, `condition_description`, `herb_changes`) VALUES
-(1, '三拗汤', '减味', '适用于外感风寒，肺气不宣之咳嗽声重，痰涕清稀，鼻塞，恶寒发热，无汗，头痛，苔薄白，脉浮紧。', '麻黄汤去桂枝');
-
--- 6. 插入方剂临床验案 (以血府逐瘀汤为例)
-INSERT INTO `formula_case` (`formula_id`, `case_title`, `patient_info`, `chief_complaint`, `history_present`, `tcm_diagnosis`, `treatment_principle`, `prescription`, `outcome`, `doctor_name`, `case_date`) VALUES
-(3, '王某某，头痛案', '患者，男，45岁', '反复性头痛五年，痛如针刺，部位固定', '患者五年前无明显诱因出现头痛，呈持续性刺痛，位于左侧巅顶，每因情绪激动或劳累后加重。曾多方求医，效果不佳。近一月疼痛加剧，伴有心烦易怒，夜寐不安。', '头痛（瘀血头痛）', '活血化瘀，行气止痛', '血府逐瘀汤原方，七剂', '服药七剂后，头痛明显减轻，睡眠改善。继续调理半月，头痛基本消失，随访半年未复发。', '李医生', '2023-05-10');
-
--- 7. 插入方剂评价 (以四君子汤为例)
-INSERT INTO `formula_evaluation` (`formula_id`, `evaluator_id`, `evaluation_type`, `score`, `evaluation_content`, `status`) VALUES
-(2, 108, '临床疗效', 4.8, '我母亲脾胃虚弱，食欲不振，服用四君子汤加减化裁后，食欲明显改善，精神状态也好了很多，是健脾益气良方。', 'approved');
-
--- ----------------------------
--- Records for Research Module
--- ----------------------------
-
--- 1. 插入科研项目
-INSERT INTO `research_project` (`id`, `project_name`, `project_code`, `project_type`, `principal_investigator`, `start_date`, `end_date`, `status`, `abstract_text`) VALUES
-(1, '中药复方A对阿尔茨海默病模型大鼠神经保护作用的机制研究', 'NSFC-81873200', '国家自然科学基金面上项目', 101, '2019-01-01', '2022-12-31', 'completed', '本项目旨在研究中药复方A通过调控神经炎症和氧化应激对AD模型大鼠的神经保护作用及其分子机制。'),
-(2, '针刺对功能性消化不良患者胃肠动力及脑-肠轴调控的研究', 'MOST-2021YFC0000', '国家重点研发计划', 108, '2022-01-01', '2025-12-31', 'active', '本项目拟通过多中心、随机对照试验，探讨针刺治疗功能性消化不良的临床疗效，并利用多模态神经影像技术研究其对中枢及外周胃肠动力的影响。');
-
--- 2. 插入科研成果 (论文)
-INSERT INTO `research_achievement` (`project_id`, `achievement_type`, `title`, `authors`, `publication`, `publish_date`, `doi`, `keywords`, `status`, `created_by`, `citation_count`, `abstract_text`) VALUES
-(1, 'paper', 'Neuroprotective effects of Chinese herbal formula A on cognitive impairment in a rat model of Alzheimer''s disease', '张三, 李四, 王五', 'Journal of Ethnopharmacology', '2021-06-15', '10.1016/j.jep.2021.114000', '阿尔茨海默病; 中药; 神经保护; 氧化应激', 'published', 101, 15, '研究发现，中药复方A能显著改善AD模型大鼠的学习记忆能力，其机制可能与抑制海马区小胶质细胞活化和降低氧化应激水平有关。'),
-(1, 'paper', 'Traditional Chinese medicine as a promising strategy for the treatment of Alzheimer''s disease', '李四, 赵六', 'Phytomedicine', '2022-03-20', '10.1016/j.phymed.2022.153888', '中医药; 阿尔茨海默病; 综述', 'published', 101, 8, '本文综述了近年来中医药在AD治疗方面的研究进展，总结了多种活性成分和复方的潜在作用靶点和机制，并展望了其未来的研究方向。'),
-(2, 'paper', 'Efficacy of Acupuncture on Dyspepsia: A Randomized Controlled Trial', '王五, 孙七', 'The Lancet Gastroenterology & Hepatology', '2023-11-01', '10.1016/S2468-1253(23)00300-X', '针刺; 功能性消化不良; 随机对照试验', 'published', 108, 2, '研究结果表明，与假针刺相比，真实针刺能显著改善功能性消化不良患者的餐后不适综合征和上腹痛综合征评分。'),
-(NULL, 'patent', '一种用于改善记忆的中药组合物及其制备方法', '张三', '国家知识产权局', '2022-08-10', 'CN115000000A', '中药; 专利; 记忆', 'published', 101, 0, '本发明公开了一种包含人参、远志等药材的中药组合物，实验表明其具有显著改善学习记忆障碍的作用。');
 
 SET FOREIGN_KEY_CHECKS = 1;
