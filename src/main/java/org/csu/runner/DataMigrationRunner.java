@@ -3,6 +3,8 @@ package org.csu.runner;
 import org.csu.domain.node.*;
 import org.csu.domain.relationship.HerbComponent;
 import org.csu.repository.*;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.Session;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -19,16 +21,19 @@ public class DataMigrationRunner implements CommandLineRunner {
     private final SyndromeRepository syndromeRepository;
     private final FormulaRepository formulaRepository;
     private final HerbRepository herbRepository;
+    private final Driver neo4jDriver;
 
     public DataMigrationRunner(JdbcTemplate jdbcTemplate, DiseaseRepository diseaseRepository,
                                SymptomRepository symptomRepository, SyndromeRepository syndromeRepository,
-                               FormulaRepository formulaRepository, HerbRepository herbRepository) {
+                               FormulaRepository formulaRepository, HerbRepository herbRepository,
+                               Driver neo4jDriver) {
         this.jdbcTemplate = jdbcTemplate;
         this.diseaseRepository = diseaseRepository;
         this.symptomRepository = symptomRepository;
         this.syndromeRepository = syndromeRepository;
         this.formulaRepository = formulaRepository;
         this.herbRepository = herbRepository;
+        this.neo4jDriver = neo4jDriver;
     }
 
     @Override
@@ -40,36 +45,44 @@ public class DataMigrationRunner implements CommandLineRunner {
 //        }
 
         System.out.println("--- [数据迁移] 开始 ---");
+        clearDatabase();
         migrateNodes();
         migrateRelationships();
         System.out.println("--- [数据迁移] 成功结束 ---");
     }
 
+    private void clearDatabase() {
+        System.out.println("清空 Neo4j 所有节点和关系...");
+        try (Session session = neo4jDriver.session()) {
+            session.run("MATCH (n) DETACH DELETE n");
+        }
+        System.out.println("清空完成！");
+    }
+
     private void migrateNodes() {
         System.out.println("步骤1/2: 正在迁移所有基础节点...");
 
-        // **修正部分：只查询 herb 表中存在的列**
         jdbcTemplate.queryForList("SELECT name, description FROM herb").forEach(row -> {
             String name = (String) row.get("name");
             herbRepository.findByName(name).orElseGet(() -> {
                 HerbNode node = new HerbNode();
                 node.setName(name);
                 // 将MySQL的description(简介/药用价值描述) 映射到 Neo4j实体中的effect(功效)字段
-                node.setDescription((String) row.get("description"));
+                node.setDescription("药材功效:" + (String) row.get("description"));
                 node.setEffect((String) row.get("description"));
                 return herbRepository.save(node);
             });
         });
         System.out.println("  - 药材节点迁移完毕。");
 
-        // **修正部分：只查询 disease 表中存在的列，并进行合理映射**
+
         jdbcTemplate.queryForList("SELECT name, pathogenesis FROM disease").forEach(row -> {
             String name = (String) row.get("name");
             diseaseRepository.findByName(name).orElseGet(() -> {
                 DiseaseNode node = new DiseaseNode();
                 node.setName(name);
                 // 将MySQL的pathogenesis(病因病机) 映射到 Neo4j实体中的description字段
-                node.setDescription((String) row.get("pathogenesis"));
+                node.setDescription("病因病机:" + (String) row.get("pathogenesis"));
                 return diseaseRepository.save(node);
             });
         });
@@ -81,7 +94,7 @@ public class DataMigrationRunner implements CommandLineRunner {
             formulaRepository.findByName(name).orElseGet(() -> {
                 FormulaNode node = new FormulaNode();
                 node.setName(name);
-                node.setDescription((String) row.get("function_effect"));
+                node.setDescription("功用" + (String) row.get("function_effect"));
                 node.setSource((String) row.get("source"));
                 node.setComposition((String) row.get("composition"));
                 node.setUsage((String) row.get("usage"));
@@ -168,14 +181,13 @@ public class DataMigrationRunner implements CommandLineRunner {
                         SyndromeNode syndromeNode = syndromeRepository.findByName(syndromeName).orElseGet(() -> {
                             SyndromeNode newSyndrome = new SyndromeNode();
                             newSyndrome.setName(syndromeName);
-                            newSyndrome.setDescription(syndromeName);
+                            newSyndrome.setDescription("证候为:" + syndromeName);
                             return syndromeRepository.save(newSyndrome);
                         });
                         // 建立 Formula -> Syndrome 关系
                         if (formula.getTreatedSyndromes() == null) formula.setTreatedSyndromes(new HashSet<>());
                         formula.getTreatedSyndromes().add(syndromeNode);
 
-                        // 建立 Disease -> Syndrome 关系
                         if (disease.getSyndromes() == null) disease.setSyndromes(new HashSet<>());
                         disease.getSyndromes().add(syndromeNode);
                         diseaseRepository.save(disease);
