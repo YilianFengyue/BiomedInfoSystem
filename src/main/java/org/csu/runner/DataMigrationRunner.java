@@ -55,7 +55,7 @@ public class DataMigrationRunner implements CommandLineRunner {
                 HerbNode node = new HerbNode();
                 node.setName(name);
                 // 将MySQL的description(简介/药用价值描述) 映射到 Neo4j实体中的effect(功效)字段
-                node.setDescription((String) row.get("description"));
+                node.setDescription("药材功效:" + (String) row.get("description"));
                 node.setEffect((String) row.get("description"));
                 return herbRepository.save(node);
             });
@@ -69,7 +69,7 @@ public class DataMigrationRunner implements CommandLineRunner {
                 DiseaseNode node = new DiseaseNode();
                 node.setName(name);
                 // 将MySQL的pathogenesis(病因病机) 映射到 Neo4j实体中的description字段
-                node.setDescription((String) row.get("pathogenesis"));
+                node.setDescription("病因病机:" + (String) row.get("pathogenesis"));
                 return diseaseRepository.save(node);
             });
         });
@@ -81,7 +81,7 @@ public class DataMigrationRunner implements CommandLineRunner {
             formulaRepository.findByName(name).orElseGet(() -> {
                 FormulaNode node = new FormulaNode();
                 node.setName(name);
-                node.setDescription((String) row.get("function_effect"));
+                node.setDescription("功用" + (String) row.get("function_effect"));
                 node.setSource((String) row.get("source"));
                 node.setComposition((String) row.get("composition"));
                 node.setUsage((String) row.get("usage"));
@@ -168,7 +168,7 @@ public class DataMigrationRunner implements CommandLineRunner {
                         SyndromeNode syndromeNode = syndromeRepository.findByName(syndromeName).orElseGet(() -> {
                             SyndromeNode newSyndrome = new SyndromeNode();
                             newSyndrome.setName(syndromeName);
-                            newSyndrome.setDescription(syndromeName);
+                            newSyndrome.setDescription("证候为:" + syndromeName);
                             return syndromeRepository.save(newSyndrome);
                         });
                         // 建立 Formula -> Syndrome 关系
