@@ -1,5 +1,7 @@
 package org.csu.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -7,6 +9,7 @@ import java.sql.Timestamp;
 @TableName("user_evaluation")
 public class UserEvaluation {
 
+    @TableId(type = IdType.AUTO)
     private Long id;
     private Long userId;
     private Integer periodId;
