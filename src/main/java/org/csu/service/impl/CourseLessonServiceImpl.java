@@ -46,14 +46,14 @@ public class CourseLessonServiceImpl extends ServiceImpl<CourseLessonDao, Course
                 throw new BusinessException(Code.SAVE_ERR, "创建失败：关联的图文资源不存在，ID: " + createDto.getResourceId());
             }
             // 创建一个指向图文资源详情页的内部链接
-            lesson.setContentUrl("resource-detail/" + resource.getId());
+            lesson.setContentUrl("biomedicine/resource-detail/" + resource.getId());
         } else if ("video".equalsIgnoreCase(createDto.getContentType())) {
             EduVideos video = videosDao.selectById(createDto.getResourceId());
             if (video == null) {
                 throw new BusinessException(Code.SAVE_ERR, "创建失败：关联的视频资源不存在，ID: " + createDto.getResourceId());
             }
             // 创建一个指向视频资源详情页的内部链接
-            lesson.setContentUrl("VideoDetail/" + video.getId());
+            lesson.setContentUrl("biomedicine/VideoDetail/" + video.getId());
             lesson.setDuration(video.getDuration());
         } else {
             throw new BusinessException(Code.VALIDATE_ERR, "无效的资源类型，必须是 'document' 或 'video'");
@@ -68,5 +68,14 @@ public class CourseLessonServiceImpl extends ServiceImpl<CourseLessonDao, Course
         lessonDto.setResourceUrl(lesson.getContentUrl());
 
         return lessonDto;
+    }
+
+    @Override
+    public void deleteLesson(Long lessonId) {
+        // 删除课时是最简单的，因为它没有下级关联
+        boolean success = this.removeById(lessonId);
+        if (!success) {
+            throw new BusinessException(Code.DELETE_ERR, "删除失败：课时不存在，ID: " + lessonId);
+        }
     }
 }

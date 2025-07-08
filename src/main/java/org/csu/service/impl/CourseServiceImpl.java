@@ -2,12 +2,17 @@ package org.csu.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.csu.config.BusinessException;
+import org.csu.controller.Code;
 import org.csu.dao.*;
 import org.csu.domain.*;
 import org.csu.dto.*;
+import org.csu.service.ICourseChapterService;
 import org.csu.service.ICourseService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +22,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl extends ServiceImpl<CourseDao, Course> implements ICourseService {
+
+    @Autowired
+    private ICourseChapterService courseChapterService; // 【修正】注入 Service 而不是 DAO
+
 
     @Autowired
     private CourseChapterDao chapterDao;
@@ -129,4 +138,51 @@ public class CourseServiceImpl extends ServiceImpl<CourseDao, Course> implements
         return courseListDtos;
     }
 
+
+    @Override
+    @Transactional // 使用事务确保课程和章节的创建是原子操作
+    public CourseDetailDto createCourse(CourseCreateDto createDto) {
+        // 1. 创建并保存Course实体
+        Course course = new Course();
+        BeanUtils.copyProperties(createDto, course);
+        course.setStatus("published");
+        this.save(course); // 'this' 指向 IService<Course>，调用save是正确的
+
+        // 2. 遍历DTO中的章节信息，创建并保存CourseChapter实体
+        if (createDto.getChapters() != null && !createDto.getChapters().isEmpty()) {
+            List<CourseChapter> chaptersToSave = createDto.getChapters().stream().map(chapterDto -> {
+                CourseChapter chapter = new CourseChapter();
+                BeanUtils.copyProperties(chapterDto, chapter);
+                chapter.setCourseId(course.getId());
+                return chapter;
+            }).collect(Collectors.toList());
+
+            // 【修正】使用注入的 courseChapterService 来执行批量保存
+            if (!chaptersToSave.isEmpty()) {
+                courseChapterService.saveBatch(chaptersToSave);
+            }
+        }
+
+        // 3. 返回新创建课程的完整详细信息
+        return this.getCourseWithChaptersAndLessons(course.getId());
+    }
+
+    @Override
+    @Transactional // 确保删除操作的原子性
+    public void deleteCourse(Long courseId) {
+        // 1. 检查课程是否存在
+        Course course = this.getById(courseId);
+        if (course == null) {
+            throw new BusinessException(Code.DELETE_ERR, "删除失败：课程不存在，ID: " + courseId);
+        }
+
+        // 2. 删除该课程下的所有课时 (course_lesson)
+        lessonDao.delete(new LambdaQueryWrapper<CourseLesson>().eq(CourseLesson::getCourseId, courseId));
+
+        // 3. 删除该课程下的所有章节 (course_chapter)
+        courseChapterService.remove(new LambdaQueryWrapper<CourseChapter>().eq(CourseChapter::getCourseId, courseId));
+
+        // 4. 最后删除课程本身 (course)
+        this.removeById(courseId);
+    }
 }
