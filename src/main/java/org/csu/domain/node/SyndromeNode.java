@@ -16,6 +16,7 @@ public class SyndromeNode {
     private Long id;
     private String name;        // 证候名称
     private String analysis;    // 证候分析
+    private String description;
 
     // 关系：证候 -> 表现为 -> 症状
     @Relationship(type = "HAS_SYMPTOM", direction = Relationship.Direction.OUTGOING)

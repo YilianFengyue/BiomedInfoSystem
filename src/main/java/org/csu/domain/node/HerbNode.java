@@ -21,6 +21,7 @@ public class HerbNode {
     private String effect;      // 功效
     private String usage;       // 用法用量
     private String taboo;       // 禁忌
+    private String description;
 
     // 关系：药材 -> 治疗 -> 疾病
     @Relationship(type = "TREATS", direction = Relationship.Direction.OUTGOING)
