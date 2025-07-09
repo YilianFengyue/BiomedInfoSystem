@@ -44,4 +44,11 @@ public class AuthenticationHelperUtil {
 
         return responseData;
     }
+    public static Long getCurrentUserId() {
+        Map<String, Object> claims = ThreadLocalUtil.getThreadLocal();
+        if (claims == null || !claims.containsKey("id")) {
+            throw new RuntimeException("未登录或登录已失效");
+        }
+        return ((Number) claims.get("id")).longValue();
+    }
 }
