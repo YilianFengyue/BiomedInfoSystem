@@ -1,6 +1,8 @@
 package org.csu.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
+import org.csu.dto.CourseCreateDto;
 import org.csu.dto.CourseDetailDto;
 import org.csu.dto.CourseListDto;
 import org.csu.service.ICourseService;
@@ -34,6 +36,21 @@ public class CourseController {
     public Result<List<CourseListDto>> getAllCourses() {
         List<CourseListDto> courses = courseService.getAllCourses();
         return Result.success(courses);
+    }
+
+
+    @PostMapping
+    @Operation(summary = "创建新课程", description = "创建一个新的课程，并可以同时创建其下的章节")
+    public Result<CourseDetailDto> createCourse(@Valid @RequestBody CourseCreateDto createDto) {
+        CourseDetailDto createdCourse = courseService.createCourse(createDto);
+        return Result.success(createdCourse, "课程创建成功");
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "删除课程", description = "根据ID删除一个课程及其所有相关内容")
+    public Result<?> deleteCourse(@PathVariable Long id) {
+        courseService.deleteCourse(id);
+        return Result.success("课程删除成功");
     }
 
 }
