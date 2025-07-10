@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 08/07/2025 17:02:26
+ Date: 09/07/2025 15:11:14
 */
 
 SET NAMES utf8mb4;
@@ -988,7 +988,7 @@ CREATE TABLE `herb_growth_data`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_location_metric`(`location_id` ASC, `metric_name` ASC) USING BTREE COMMENT '同一观测点同一指标唯一',
   CONSTRAINT `fk_data_location_id` FOREIGN KEY (`location_id`) REFERENCES `herb_location` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 47 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '生长/统计数据表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 48 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '生长/统计数据表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of herb_growth_data
@@ -1034,6 +1034,7 @@ INSERT INTO `herb_growth_data` VALUES (43, 151, '平均株高', '21', 'cm', '202
 INSERT INTO `herb_growth_data` VALUES (44, 152, '叶片面积', '21', 'cm²', '2025-07-08 00:57:00');
 INSERT INTO `herb_growth_data` VALUES (45, 153, '产量', '56', 'kg', '2025-07-08 00:58:00');
 INSERT INTO `herb_growth_data` VALUES (46, 154, '平均株高', '21', 'cm', '2025-07-08 00:58:00');
+INSERT INTO `herb_growth_data` VALUES (47, 155, '平均株高', '21', 'cm', '2025-07-08 01:51:00');
 
 -- ----------------------------
 -- Table structure for herb_growth_data_history
@@ -1053,7 +1054,7 @@ CREATE TABLE `herb_growth_data_history`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_history_origin_id`(`origin_id` ASC) USING BTREE,
   INDEX `idx_history_location_id`(`location_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 46 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '生长/统计数据变更历史表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 47 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '生长/统计数据变更历史表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of herb_growth_data_history
@@ -1103,6 +1104,7 @@ INSERT INTO `herb_growth_data_history` VALUES (42, 43, 151, '平均株高', NULL
 INSERT INTO `herb_growth_data_history` VALUES (43, 44, 152, '叶片面积', NULL, '21 cm²', 'CREATE', 'luyue', '2025-07-08 16:58:08', '用户初次上传数据');
 INSERT INTO `herb_growth_data_history` VALUES (44, 45, 153, '产量', NULL, '56 kg', 'CREATE', 'luyue', '2025-07-08 16:58:43', '用户初次上传数据');
 INSERT INTO `herb_growth_data_history` VALUES (45, 46, 154, '平均株高', NULL, '21 cm', 'CREATE', 'luyue', '2025-07-08 16:59:10', '用户初次上传数据');
+INSERT INTO `herb_growth_data_history` VALUES (46, 47, 155, '平均株高', NULL, '21 cm', 'CREATE', 'luyue', '2025-07-08 17:52:54', '用户初次上传数据');
 
 -- ----------------------------
 -- Table structure for herb_image
@@ -1121,7 +1123,7 @@ CREATE TABLE `herb_image`  (
   INDEX `idx_location_id_image`(`location_id` ASC) USING BTREE,
   CONSTRAINT `fk_image_herb_id` FOREIGN KEY (`herb_id`) REFERENCES `herb` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_image_location_id` FOREIGN KEY (`location_id`) REFERENCES `herb_location` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 149 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '药材图片表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 150 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '药材图片表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of herb_image
@@ -1249,6 +1251,7 @@ INSERT INTO `herb_image` VALUES (145, 96, 151, 'https://biomedinfo.oss-cn-beijin
 INSERT INTO `herb_image` VALUES (146, 100, 152, 'https://biomedinfo.oss-cn-beijing.aliyuncs.com/user-uploads/1751965088802_黄芪.webp', 0, '附加图片: 黄芪.webp', '2025-07-08 16:58:10');
 INSERT INTO `herb_image` VALUES (147, 103, 153, 'https://biomedinfo.oss-cn-beijing.aliyuncs.com/user-uploads/1751965123619_龙眼肉.webp', 0, '附加图片: 龙眼肉.webp', '2025-07-08 16:58:44');
 INSERT INTO `herb_image` VALUES (148, 107, 154, 'https://biomedinfo.oss-cn-beijing.aliyuncs.com/user-uploads/1751965149982_龙胆.webp', 0, '附加图片: 龙胆.webp', '2025-07-08 16:59:10');
+INSERT INTO `herb_image` VALUES (149, 1, 155, 'https://biomedinfo.oss-cn-beijing.aliyuncs.com/user-uploads/1751968374421_人参2.webp', 0, '附加图片: 人参2.webp', '2025-07-08 17:52:55');
 
 -- ----------------------------
 -- Table structure for herb_location
@@ -1268,7 +1271,7 @@ CREATE TABLE `herb_location`  (
   INDEX `idx_herb_id`(`herb_id` ASC) USING BTREE,
   INDEX `idx_province_city`(`province` ASC, `city` ASC) USING BTREE,
   CONSTRAINT `fk_location_herb_id` FOREIGN KEY (`herb_id`) REFERENCES `herb` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 155 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '药材地理分布(观测点)表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 156 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '药材地理分布(观测点)表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of herb_location
@@ -1400,6 +1403,7 @@ INSERT INTO `herb_location` VALUES (151, 96, 121.5090620, 25.0443320, '台湾省
 INSERT INTO `herb_location` VALUES (152, 100, 104.3977950, 31.1274490, '四川省', '德阳市', '德阳市', 2025, '2025-07-08 16:58:06');
 INSERT INTO `herb_location` VALUES (153, 103, 117.6389190, 26.2634550, '福建省', '三明市', '三明市', 2025, '2025-07-08 16:58:43');
 INSERT INTO `herb_location` VALUES (154, 107, 113.5973240, 24.8109770, '广东省', '韶关市', '韶关市', 2025, '2025-07-08 16:59:09');
+INSERT INTO `herb_location` VALUES (155, 1, 120.7378980, 30.7882860, '浙江省', '嘉兴市', '嘉兴市', 2025, '2025-07-08 17:52:54');
 
 -- ----------------------------
 -- Table structure for indicator_score
@@ -1506,11 +1510,21 @@ CREATE TABLE `message`  (
   `send_time` datetime NOT NULL,
   `read_status` tinyint NULL DEFAULT 0 COMMENT '0-未读，1-已读',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1942494057406201858 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 1942606206821101571 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of message
 -- ----------------------------
+INSERT INTO `message` VALUES (1942567956236607490, '109', '111', 'hello', '2025-07-08 20:54:27', 1);
+INSERT INTO `message` VALUES (1942598539050414081, '111', '109', '你好', '2025-07-08 22:55:58', 1);
+INSERT INTO `message` VALUES (1942598817359261697, '109', '111', '谢谢你', '2025-07-08 22:57:04', 1);
+INSERT INTO `message` VALUES (1942601278337789954, '111', '109', '你是乃龙吗', '2025-07-08 23:06:51', 1);
+INSERT INTO `message` VALUES (1942601502141657089, '109', '111', '我才是乃龙！', '2025-07-08 23:07:45', 1);
+INSERT INTO `message` VALUES (1942601664926789633, '111', '109', '我会喷火，你会吗', '2025-07-08 23:08:23', 1);
+INSERT INTO `message` VALUES (1942601735701475330, '109', '111', '可恶，你也会', '2025-07-08 23:08:40', 0);
+INSERT INTO `message` VALUES (1942604161347121154, '109', '111', '我会变色', '2025-07-08 23:18:19', 1);
+INSERT INTO `message` VALUES (1942606139791929345, '111', '109', '真的吗', '2025-07-08 23:26:10', 1);
+INSERT INTO `message` VALUES (1942606206821101570, '109', '111', '真的', '2025-07-08 23:26:26', 1);
 
 -- ----------------------------
 -- Table structure for operation_log
@@ -1575,39 +1589,10 @@ INSERT INTO `performance_data` VALUES (5, 108, 'TEACHING', 'student_rating', '4.
 INSERT INTO `performance_data` VALUES (6, 109, 'INNOVATION', 'patent_count', '2', '2024-12-31', 'system', 'valid', '2025-07-06 11:02:16');
 
 -- ----------------------------
--- Table structure for project_member
+-- Table structure for res_achievement
 -- ----------------------------
-DROP TABLE IF EXISTS `project_member`;
-CREATE TABLE `project_member`  (
-  `id` bigint NOT NULL AUTO_INCREMENT,
-  `project_id` bigint NOT NULL COMMENT '项目ID',
-  `user_id` bigint NOT NULL COMMENT '用户ID',
-  `role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '角色',
-  `contribution_rate` decimal(5, 2) NULL DEFAULT NULL COMMENT '贡献度百分比',
-  `join_date` date NULL DEFAULT NULL COMMENT '加入日期',
-  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'active' COMMENT '状态',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`) USING BTREE,
-  UNIQUE INDEX `uk_project_user`(`project_id` ASC, `user_id` ASC) USING BTREE,
-  INDEX `user_id`(`user_id` ASC) USING BTREE,
-  CONSTRAINT `project_member_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `research_project` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
-  CONSTRAINT `project_member_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '项目参与人员表' ROW_FORMAT = DYNAMIC;
-
--- ----------------------------
--- Records of project_member
--- ----------------------------
-INSERT INTO `project_member` VALUES (1, 1, 101, 'PI', 40.00, '2024-01-01', 'active', '2025-07-06 11:02:16');
-INSERT INTO `project_member` VALUES (2, 1, 108, 'Co-PI', 25.00, '2024-01-01', 'active', '2025-07-06 11:02:16');
-INSERT INTO `project_member` VALUES (3, 1, 109, 'researcher', 20.00, '2024-01-15', 'active', '2025-07-06 11:02:16');
-INSERT INTO `project_member` VALUES (4, 2, 108, 'PI', 50.00, '2023-07-01', 'active', '2025-07-06 11:02:16');
-INSERT INTO `project_member` VALUES (5, 2, 110, 'researcher', 30.00, '2023-07-01', 'active', '2025-07-06 11:02:16');
-
--- ----------------------------
--- Table structure for research_achievement
--- ----------------------------
-DROP TABLE IF EXISTS `research_achievement`;
-CREATE TABLE `research_achievement`  (
+DROP TABLE IF EXISTS `res_achievement`;
+CREATE TABLE `res_achievement`  (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `project_id` bigint NULL DEFAULT NULL COMMENT '关联项目ID',
   `achievement_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '成果类型',
@@ -1627,21 +1612,137 @@ CREATE TABLE `research_achievement`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `idx_project_id`(`project_id` ASC) USING BTREE,
   INDEX `idx_achievement_type`(`achievement_type` ASC) USING BTREE,
-  INDEX `idx_publish_date`(`publish_date` ASC) USING BTREE
+  INDEX `idx_publish_date`(`publish_date` ASC) USING BTREE,
+  CONSTRAINT `fk_res_achievement_project` FOREIGN KEY (`project_id`) REFERENCES `res_project` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
 ) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci COMMENT = '科研成果表(论文、专利等)' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Records of research_achievement
+-- Records of res_achievement
 -- ----------------------------
-INSERT INTO `research_achievement` VALUES (1, 1, '论文', '小青龙汤治疗过敏性鼻炎的临床研究', '张三, 李四', '中华中医药杂志', '2023-05-10', 2.150, 15, '10.1000/xyz123', '目的：探讨小青龙汤治疗过敏性鼻炎的临床疗效。方法：选取100例过敏性鼻炎患者随机分为治疗组和对照组...', '小青龙汤, 过敏性鼻炎, 临床研究', 'http://example.com/paper1.pdf', 'approved', 1, '2025-07-07 19:10:32');
-INSERT INTO `research_achievement` VALUES (2, 1, '论文', '桂枝汤加减治疗体虚感冒的系统评价', '王五, 赵六', '中国中药杂志', '2022-11-20', 3.450, 45, '10.1000/abc789', '目的：系统评价桂枝汤加减治疗体虚感冒的有效性及安全性。方法：检索多个数据库，收集相关随机对照试验进行Meta分析...', '桂枝汤, 体虚感冒, Meta分析', 'http://example.com/paper2.pdf', 'approved', 1, '2025-07-07 19:10:32');
-INSERT INTO `research_achievement` VALUES (3, 2, '专利', '一种从黄芪中提取多糖的新工艺', '钱七', NULL, '2024-01-15', NULL, NULL, 'CN12345678A', '本发明公开了一种从黄芪中高效提取黄芪多糖的工艺方法，包括超声辅助提取、双水相萃取纯化等步骤...', '黄芪多糖, 提取工艺, 专利', 'http://example.com/patent1.pdf', 'approved', 2, '2025-07-07 19:10:32');
+INSERT INTO `res_achievement` VALUES (1, 1, '论文', '小青龙汤治疗过敏性鼻炎的临床研究', '张三, 李四', '中华中医药杂志', '2023-05-10', 2.150, 15, '10.1000/xyz123', '目的：探讨小青龙汤治疗过敏性鼻炎的临床疗效。方法：选取100例过敏性鼻炎患者随机分为治疗组和对照组...', '小青龙汤, 过敏性鼻炎, 临床研究', 'http://example.com/paper1.pdf', 'approved', 1, '2025-07-07 19:10:32');
+INSERT INTO `res_achievement` VALUES (2, 1, '论文', '桂枝汤加减治疗体虚感冒的系统评价', '王五, 赵六', '中国中药杂志', '2022-11-20', 3.450, 45, '10.1000/abc789', '目的：系统评价桂枝汤加减治疗体虚感冒的有效性及安全性。方法：检索多个数据库，收集相关随机对照试验进行Meta分析...', '桂枝汤, 体虚感冒, Meta分析', 'http://example.com/paper2.pdf', 'approved', 1, '2025-07-07 19:10:32');
+INSERT INTO `res_achievement` VALUES (3, 2, '专利', '一种从黄芪中提取多糖的新工艺', '钱七', NULL, '2024-01-15', NULL, NULL, 'CN12345678A', '本发明公开了一种从黄芪中高效提取黄芪多糖的工艺方法，包括超声辅助提取、双水相萃取纯化等步骤...', '黄芪多糖, 提取工艺, 专利', 'http://example.com/patent1.pdf', 'approved', 2, '2025-07-07 19:10:32');
 
 -- ----------------------------
--- Table structure for research_project
+-- Table structure for res_paper_review
 -- ----------------------------
-DROP TABLE IF EXISTS `research_project`;
-CREATE TABLE `research_project`  (
+DROP TABLE IF EXISTS `res_paper_review`;
+CREATE TABLE `res_paper_review`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `submission_id` bigint NOT NULL COMMENT '提交记录ID',
+  `reviewer_id` bigint NOT NULL COMMENT '评审人ID',
+  `overall_score` decimal(3, 1) NULL DEFAULT NULL COMMENT '总体评分(1-10)',
+  `content_score` decimal(3, 1) NULL DEFAULT NULL COMMENT '内容质量评分',
+  `innovation_score` decimal(3, 1) NULL DEFAULT NULL COMMENT '创新性评分',
+  `methodology_score` decimal(3, 1) NULL DEFAULT NULL COMMENT '方法学评分',
+  `writing_score` decimal(3, 1) NULL DEFAULT NULL COMMENT '写作质量评分',
+  `review_comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '评审意见',
+  `suggestions` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '修改建议',
+  `review_result` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '评审结果：accept/minor_revision/major_revision/reject',
+  `review_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `is_final` tinyint(1) NULL DEFAULT 0 COMMENT '是否为最终评审',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_submission_id`(`submission_id` ASC) USING BTREE,
+  INDEX `idx_reviewer_id`(`reviewer_id` ASC) USING BTREE,
+  CONSTRAINT `res_paper_review_ibfk_1` FOREIGN KEY (`submission_id`) REFERENCES `res_paper_submission` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `res_paper_review_ibfk_2` FOREIGN KEY (`reviewer_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '论文评审表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of res_paper_review
+-- ----------------------------
+INSERT INTO `res_paper_review` VALUES (1, 1, 101, 9.0, 8.5, 8.0, 9.0, 8.5, '经过修改后，论文质量有了显著提升。实验部分更加完善，结论更加合理。建议接收发表。', '论文已达到发表要求，建议投稿至相关期刊。', 'accept', '2025-07-08 22:41:20', 1);
+INSERT INTO `res_paper_review` VALUES (2, 2, 108, 7.8, 8.0, 7.0, 8.0, 8.5, '数据库构建工作扎实，数据收集全面。建议在应用案例部分增加更多示例，并考虑数据库的可扩展性设计。', '1. 增加应用案例展示\n2. 讨论数据库扩展方案\n3. 补充数据质量控制措施\n4. 完善用户界面设计', 'minor_revision', '2024-07-05 15:20:00', 0);
+INSERT INTO `res_paper_review` VALUES (3, 1, 109, 8.5, 8.0, 7.5, 8.5, 8.0, '论文选题有意义，研究方法得当，算法设计较为完善。在以下几个方面还需要改进：1）实验部分需要增加更多对比实验；2）结论部分需要进一步讨论算法的局限性；3）参考文献需要补充最新的相关研究。', '1. 补充与现有主流算法的对比实验\n2. 增加算法在不同数据集上的泛化性能测试\n3. 完善算法复杂度分析\n4. 优化论文结构，提高可读性\n5. 补充相关的最新文献引用', 'minor_revision', '2025-07-08 22:38:50', 0);
+INSERT INTO `res_paper_review` VALUES (4, 1, 109, 8.5, 8.0, 7.5, 8.5, 8.0, '论文选题有意义，研究方法得当，算法设计较为完善。在以下几个方面还需要改进：1）实验部分需要增加更多对比实验；2）结论部分需要进一步讨论算法的局限性；3）参考文献需要补充最新的相关研究。', '1. 补充与现有主流算法的对比实验\n2. 增加算法在不同数据集上的泛化性能测试\n3. 完善算法复杂度分析\n4. 优化论文结构，提高可读性\n5. 补充相关的最新文献引用', 'minor_revision', '2025-07-09 12:08:21', 0);
+
+-- ----------------------------
+-- Table structure for res_paper_submission
+-- ----------------------------
+DROP TABLE IF EXISTS `res_paper_submission`;
+CREATE TABLE `res_paper_submission`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `task_id` bigint NOT NULL COMMENT '任务ID',
+  `student_id` bigint NOT NULL COMMENT '学生ID',
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '论文标题',
+  `abstract` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '论文摘要',
+  `keywords` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '关键词',
+  `file_url` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '文件地址',
+  `file_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '原始文件名',
+  `file_size` bigint NULL DEFAULT NULL COMMENT '文件大小(字节)',
+  `version` int NULL DEFAULT 1 COMMENT '版本号',
+  `submission_notes` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '提交说明',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'submitted' COMMENT '状态：submitted/reviewing/approved/needs_revision/rejected',
+  `submission_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_task_id`(`task_id` ASC) USING BTREE,
+  INDEX `idx_student_id`(`student_id` ASC) USING BTREE,
+  INDEX `idx_status`(`status` ASC) USING BTREE,
+  INDEX `idx_version`(`task_id` ASC, `version` ASC) USING BTREE,
+  CONSTRAINT `res_paper_submission_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `res_task` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `res_paper_submission_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '论文提交表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of res_paper_submission
+-- ----------------------------
+INSERT INTO `res_paper_submission` VALUES (1, 2, 109, '基于深度学习的中医症状文本预处理算法研究（修订11）', '根据评审意见，本文进一步完善了算法设计，增加了对比实验，优化了模型性能...', '深度学习,中医症状,文本预处理,实体识别,同义词归并,对比实验', 'https://biomedinfo.oss-cn-beijing.aliyuncs.com/research-papers/tcm_symptom_preprocessing_v2.pdf', '中医症状预处理算法研究_修订版.pdf', 2356789, 1, '根据老师的评审意见进行了以下修改：1.增加了与现有算法的对比实验；2.完善了算法复杂度分析；3.优化了论文结构和表达。', 'submitted', '2025-07-09 12:39:40');
+INSERT INTO `res_paper_submission` VALUES (2, 1, 108, '血府逐瘀汤化学成分数据库的构建与应用', '目的：建立血府逐瘀汤标准化化学成分数据库，为后续药理研究提供数据支撑。方法：通过文献调研和实验验证，收集整理化学成分信息。结果：建立了包含523个化合物的标准化数据库，涵盖结构式、理化性质、药理活性等信息。', '血府逐瘀汤,化学成分,数据库,中药', 'https://biomedinfo.oss-cn-beijing.aliyuncs.com/research-papers/xuefuzhuyu_database_v1.pdf', '血府逐瘀汤成分数据库_阶段报告.pdf', 1536000, 1, '阶段性成果报告，已完成主要化学成分的收集整理工作。', 'submitted', '2024-07-01 14:30:00');
+INSERT INTO `res_paper_submission` VALUES (3, 2, 109, '基于深度学习的中医症状文本预处理算法研究', '本文提出了一种基于深度学习的中医症状文本预处理算法，通过构建症状实体识别模型和同义词归并算法，实现了对中医症状描述的标准化处理。实验结果表明，该算法在症状实体识别任务上达到了92%的准确率，在同义词归并任务上达到了89%的准确率，为中医智能诊断系统的构建提供了有效的技术支撑。', '深度学习,中医症状,文本预处理,实体识别,同义词归并', 'https://biomedinfo.oss-cn-beijing.aliyuncs.com/research-papers/tcm_symptom_preprocessing_v1.pdf', '中医症状预处理算法研究_初稿.pdf', 2048576, 2, '这是论文的初稿版本，已完成主要算法设计和实验验证。请老师审阅并提出修改建议。实验代码已上传至项目GitHub仓库。', 'submitted', '2025-07-09 09:31:06');
+INSERT INTO `res_paper_submission` VALUES (4, 2, 109, '基于深度学习的中医症状文本预处理算法研究(测试更新）', '根据评审意见，本文进一步完善了算法设计，增加了对比实验，优化了模型性能...', '深度学习,中医症状,文本预处理,实体识别,同义词归并,对比实验', 'https://biomedinfo.oss-cn-beijing.aliyuncs.com/research-papers/tcm_symptom_preprocessing_v2.pdf', '中医症状预处理算法研究_修订版.pdf', 2356789, 3, '根据老师的评审意见进行了以下修改：1.增加了与现有算法的对比实验；2.完善了算法复杂度分析；3.优化了论文结构和表达。', 'submitted', '2025-07-09 10:42:34');
+INSERT INTO `res_paper_submission` VALUES (5, 2, 109, '基于深度学习的中医症状文本预处理算法研究', '本文提出了一种基于深度学习的中医症状文本预处理算法，通过构建症状实体识别模型和同义词归并算法，实现了对中医症状描述的标准化处理。实验结果表明，该算法在症状实体识别任务上达到了92%的准确率，在同义词归并任务上达到了89%的准确率，为中医智能诊断系统的构建提供了有效的技术支撑。', '深度学习,中医症状,文本预处理,实体识别,同义词归并', 'https://biomedinfo.oss-cn-beijing.aliyuncs.com/research-papers/tcm_symptom_preprocessing_v1.pdf', '中医症状预处理算法研究_初稿.pdf', 2048576, 4, '这是论文的初稿版本，已完成主要算法设计和实验验证。请老师审阅并提出修改建议。实验代码已上传至项目GitHub仓库。', 'submitted', '2025-07-09 12:35:07');
+
+-- ----------------------------
+-- Table structure for res_progress_log
+-- ----------------------------
+DROP TABLE IF EXISTS `res_progress_log`;
+CREATE TABLE `res_progress_log`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `task_id` bigint NOT NULL COMMENT '任务ID',
+  `user_id` bigint NOT NULL COMMENT '操作人ID',
+  `progress_type` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '进度类型：task_created/task_assigned/paper_submitted/review_completed等',
+  `progress_content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '进度内容描述',
+  `attachments` json NULL COMMENT '附件信息',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_task_id`(`task_id` ASC) USING BTREE,
+  INDEX `idx_user_id`(`user_id` ASC) USING BTREE,
+  INDEX `idx_progress_type`(`progress_type` ASC) USING BTREE,
+  CONSTRAINT `res_progress_log_ibfk_1` FOREIGN KEY (`task_id`) REFERENCES `res_task` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `res_progress_log_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 23 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '科研进度记录表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of res_progress_log
+-- ----------------------------
+INSERT INTO `res_progress_log` VALUES (1, 1, 101, 'task_created', '创建化学成分数据库构建任务，分配给学生完成', NULL, '2024-01-20 09:00:00');
+INSERT INTO `res_progress_log` VALUES (2, 1, 108, 'task_accepted', '接受任务，开始文献调研工作', NULL, '2024-01-20 14:30:00');
+INSERT INTO `res_progress_log` VALUES (3, 2, 101, 'task_created', '创建网络药理学分析平台搭建任务', NULL, '2024-01-25 10:30:00');
+INSERT INTO `res_progress_log` VALUES (4, 2, 109, 'task_accepted', '接受任务，开始学习相关算法', NULL, '2024-01-25 15:45:00');
+INSERT INTO `res_progress_log` VALUES (5, 2, 109, 'paper_submitted', '提交网络药理学机制研究论文初稿', '{\"file_name\": \"血府逐瘀汤机制研究_初稿.pdf\", \"file_size\": 2048576}', '2024-04-10 16:20:00');
+INSERT INTO `res_progress_log` VALUES (6, 2, 101, 'review_completed', '完成论文初审，提出修改意见', NULL, '2024-04-15 10:30:00');
+INSERT INTO `res_progress_log` VALUES (7, 1, 108, 'progress_update', '化学成分数据库已完成75%，预计按时完成', NULL, '2024-07-01 14:30:00');
+INSERT INTO `res_progress_log` VALUES (8, 1, 108, 'paper_submitted', '提交化学成分数据库阶段性报告', '{\"file_name\": \"血府逐瘀汤成分数据库_阶段报告.pdf\", \"file_size\": 1536000}', '2024-07-01 14:30:00');
+INSERT INTO `res_progress_log` VALUES (9, 5, 109, 'task_created', '创建任务：中医症状文本预处理算法设计', NULL, '2025-07-08 21:59:02');
+INSERT INTO `res_progress_log` VALUES (10, 2, 109, 'status_update', '任务状态更新为：in_progress', NULL, '2025-07-09 09:08:37');
+INSERT INTO `res_progress_log` VALUES (11, 2, 109, 'progress_update', '本周完成了中医症状术语的收集整理工作，共收集了500个常用症状术语，并建立了初步的分类体系。下周计划开始设计文本预处理算法的框架。', NULL, '2025-07-09 09:19:45');
+INSERT INTO `res_progress_log` VALUES (12, 2, 109, 'progress_update', '基本完成力', NULL, '2025-07-09 09:23:28');
+INSERT INTO `res_progress_log` VALUES (13, 2, 109, 'paper_submitted', '提交论文：基于深度学习的中医症状文本预处理算法研究（版本2）', NULL, '2025-07-09 09:31:05');
+INSERT INTO `res_progress_log` VALUES (14, 2, 109, 'paper_submitted', '提交论文：基于深度学习的中医症状文本预处理算法研究（版本3）', NULL, '2025-07-09 09:35:10');
+INSERT INTO `res_progress_log` VALUES (15, 2, 109, 'paper_updated', '更新论文：基于深度学习的中医症状文本预处理算法研究（修订版）', NULL, '2025-07-09 09:55:47');
+INSERT INTO `res_progress_log` VALUES (16, 2, 109, 'paper_updated', '更新论文：基于深度学习的中医症状文本预处理算法研究(测试更新）', NULL, '2025-07-09 10:42:34');
+INSERT INTO `res_progress_log` VALUES (17, 6, 109, 'task_created', '创建任务：测试用', NULL, '2025-07-09 12:01:22');
+INSERT INTO `res_progress_log` VALUES (18, 2, 109, 'status_update', '任务状态更新为：in_progress', NULL, '2025-07-09 12:31:00');
+INSERT INTO `res_progress_log` VALUES (19, 2, 109, 'progress_update', '基本完成力', NULL, '2025-07-09 12:31:49');
+INSERT INTO `res_progress_log` VALUES (20, 2, 109, 'progress_update', '基本完成', NULL, '2025-07-09 12:31:52');
+INSERT INTO `res_progress_log` VALUES (21, 2, 109, 'paper_submitted', '提交论文：基于深度学习的中医症状文本预处理算法研究（版本4）', NULL, '2025-07-09 12:35:07');
+INSERT INTO `res_progress_log` VALUES (22, 2, 109, 'paper_updated', '更新论文：基于深度学习的中医症状文本预处理算法研究（修订11）', NULL, '2025-07-09 12:39:40');
+
+-- ----------------------------
+-- Table structure for res_project
+-- ----------------------------
+DROP TABLE IF EXISTS `res_project`;
+CREATE TABLE `res_project`  (
   `id` bigint NOT NULL AUTO_INCREMENT,
   `project_name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '项目名称',
   `project_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '项目编号',
@@ -1662,14 +1763,115 @@ CREATE TABLE `research_project`  (
   INDEX `idx_pi`(`principal_investigator` ASC) USING BTREE,
   INDEX `idx_status`(`status` ASC) USING BTREE,
   INDEX `idx_type`(`project_type` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '科研项目表' ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '科研项目表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
--- Records of research_project
+-- Records of res_project
 -- ----------------------------
-INSERT INTO `research_project` VALUES (1, '基于网络药理学的血府逐瘀汤治疗冠心病机制研究', 'NSF2024-TCM-001', '国家自然科学基金', '国家自然科学基金委', 580000.00, 101, '2024-01-01', '2027-12-31', 'active', '运用网络药理学方法研究血府逐瘀汤治疗冠心病的分子机制', NULL, '中医药网络药理学', NULL, '2025-07-06 11:02:16', '2025-07-06 11:02:16');
-INSERT INTO `research_project` VALUES (2, '重庆地区野生中药资源调查与保护研究', 'CSTC2023-HERB-002', '重庆市科技计划', '重庆市科技局', 350000.00, 108, '2023-07-01', '2026-06-30', 'active', '系统调查重庆地区野生中药资源分布现状，建立保护策略', NULL, '中药资源学', NULL, '2025-07-06 11:02:16', '2025-07-06 11:02:16');
-INSERT INTO `research_project` VALUES (3, '人工智能在中医辨证论治中的应用研究', 'AI-TCM-2024-003', '企业合作', '华为技术有限公司', 800000.00, 109, '2024-03-01', '2025-02-28', 'active', '开发基于深度学习的中医智能辨证系统', NULL, '中医信息学', NULL, '2025-07-06 11:02:16', '2025-07-06 11:02:16');
+INSERT INTO `res_project` VALUES (1, '基于深度学习的中医智能诊断系统研究（测试更新）', 'NSF2024-TCM-001', '国家自然科学基金', '国家自然科学基金委', 600000.00, 101, '2024-01-01', '2027-12-31', 'active', '项目内容已更新，增加了舌象识别模块...', '深度学习,中医诊断,人工智能,辨证论治,舌象识别', '中医信息学', NULL, '2025-07-06 11:02:16', '2025-07-09 11:04:46');
+INSERT INTO `res_project` VALUES (2, '重庆地区野生中药资源调查与保护研究', 'CSTC2023-HERB-002', '重庆市科技计划', '重庆市科技局', 350000.00, 108, '2023-07-01', '2026-06-30', 'active', '系统调查重庆地区野生中药资源分布现状，建立保护策略', NULL, '中药资源学', NULL, '2025-07-06 11:02:16', '2025-07-06 11:02:16');
+INSERT INTO `res_project` VALUES (3, '人工智能在中医辨证论治中的应用研究', 'AI-TCM-2024-003', '企业合作', '华为技术有限公司', 800000.00, 109, '2024-03-01', '2025-02-28', 'active', '开发基于深度学习的中医智能辨证系统', NULL, '中医信息学', NULL, '2025-07-06 11:02:16', '2025-07-06 11:02:16');
+
+-- ----------------------------
+-- Table structure for res_project_application
+-- ----------------------------
+DROP TABLE IF EXISTS `res_project_application`;
+CREATE TABLE `res_project_application`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `project_id` bigint NOT NULL COMMENT '课题ID',
+  `student_id` bigint NOT NULL COMMENT '学生ID',
+  `application_reason` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '申请理由',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'pending' COMMENT '状态：pending/approved/rejected',
+  `reviewed_by` bigint NULL DEFAULT NULL COMMENT '审核人ID',
+  `reviewed_at` timestamp NULL DEFAULT NULL COMMENT '审核时间',
+  `review_comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '审核意见',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_project_id`(`project_id` ASC) USING BTREE,
+  INDEX `idx_student_id`(`student_id` ASC) USING BTREE,
+  INDEX `idx_status`(`status` ASC) USING BTREE,
+  INDEX `res_project_application_ibfk_3`(`reviewed_by` ASC) USING BTREE,
+  CONSTRAINT `res_project_application_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `res_project` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `res_project_application_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `res_project_application_ibfk_3` FOREIGN KEY (`reviewed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '科研课题申请表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of res_project_application
+-- ----------------------------
+INSERT INTO `res_project_application` VALUES (1, 1, 108, '我对网络药理学在中医药研究中的应用非常感兴趣，希望能够参与到血府逐瘀汤的机制研究中。我具备基础的生物信息学知识和数据分析能力，相信能够为项目做出贡献。', 'approved', 109, '2025-07-08 21:44:26', '申请理由充分，学生具备相关专业背景，同意加入项目组。期待在项目中发挥重要作用。', '2024-01-10 14:20:00', '2025-07-08 21:37:42');
+INSERT INTO `res_project_application` VALUES (2, 1, 109, '本人对中医药现代化研究有浓厚兴趣，特别是计算机技术在中医药中的应用。希望通过参与本项目提升科研能力。', 'rejected', 109, '2025-07-09 11:18:34', '很遗憾，当前项目人员已满，建议关注后续其他相关项目机会。', '2024-01-12 16:00:00', '2024-01-15 15:45:00');
+INSERT INTO `res_project_application` VALUES (3, 2, 110, '我是重庆本地学生，对本地中药资源有一定了解，希望能参与野生中药资源的调查工作。', 'approved', 109, '2025-07-09 11:10:29', '申请理由充分，学生具备相关专业背景，同意加入项目组。期待在项目中发挥重要作用。', '2024-07-01 10:15:00', '2024-07-01 10:15:00');
+INSERT INTO `res_project_application` VALUES (4, 3, 112, '对人工智能技术在传统医学中的应用很感兴趣，希望能够参与到中医智能辨证系统的开发中。', 'approved', 109, '2024-03-10 11:20:00', '编程能力强，可以参与系统开发。', '2024-03-05 09:00:00', '2024-03-10 11:20:00');
+INSERT INTO `res_project_application` VALUES (7, 1, 109, '我对深度学习在中医诊断中的应用非常感兴趣，具备扎实的计算机基础和对中医的浓厚兴趣。在本科期间学习过机器学习相关课程，掌握Python编程，希望能在项目中学习和成长，为中医现代化贡献力量。', 'pending', NULL, NULL, NULL, '2025-07-09 12:15:17', '2025-07-09 12:15:17');
+
+-- ----------------------------
+-- Table structure for res_project_member
+-- ----------------------------
+DROP TABLE IF EXISTS `res_project_member`;
+CREATE TABLE `res_project_member`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `project_id` bigint NOT NULL COMMENT '项目ID',
+  `user_id` bigint NOT NULL COMMENT '用户ID',
+  `role` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '角色',
+  `contribution_rate` decimal(5, 2) NULL DEFAULT NULL COMMENT '贡献度百分比',
+  `join_date` date NULL DEFAULT NULL COMMENT '加入日期',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'active' COMMENT '状态',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_project_user`(`project_id` ASC, `user_id` ASC) USING BTREE,
+  INDEX `user_id`(`user_id` ASC) USING BTREE,
+  CONSTRAINT `fk_res_project_member_project` FOREIGN KEY (`project_id`) REFERENCES `res_project` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `fk_res_project_member_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '项目参与人员表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of res_project_member
+-- ----------------------------
+INSERT INTO `res_project_member` VALUES (1, 1, 101, 'PI', 40.00, '2024-01-01', 'active', '2025-07-06 11:02:16');
+INSERT INTO `res_project_member` VALUES (2, 1, 108, 'Co-PI', 25.00, '2024-01-01', 'active', '2025-07-06 11:02:16');
+INSERT INTO `res_project_member` VALUES (3, 1, 109, 'researcher', 20.00, '2024-01-15', 'active', '2025-07-06 11:02:16');
+INSERT INTO `res_project_member` VALUES (4, 2, 108, 'PI', 50.00, '2023-07-01', 'active', '2025-07-06 11:02:16');
+INSERT INTO `res_project_member` VALUES (5, 2, 110, 'researcher', 30.00, '2023-07-01', 'active', '2025-07-06 11:02:16');
+
+-- ----------------------------
+-- Table structure for res_task
+-- ----------------------------
+DROP TABLE IF EXISTS `res_task`;
+CREATE TABLE `res_task`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `project_id` bigint NOT NULL COMMENT '课题ID',
+  `student_id` bigint NOT NULL COMMENT '学生ID',
+  `teacher_id` bigint NOT NULL COMMENT '教师ID',
+  `title` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '任务标题',
+  `description` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '任务描述',
+  `requirements` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '任务要求',
+  `deadline` date NULL DEFAULT NULL COMMENT '截止日期',
+  `priority` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'medium' COMMENT '优先级：low/medium/high',
+  `status` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT 'assigned' COMMENT '状态：assigned/in_progress/submitted/completed',
+  `progress` decimal(5, 2) NULL DEFAULT 0.00 COMMENT '完成进度百分比',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_project_id`(`project_id` ASC) USING BTREE,
+  INDEX `idx_student_id`(`student_id` ASC) USING BTREE,
+  INDEX `idx_teacher_id`(`teacher_id` ASC) USING BTREE,
+  INDEX `idx_status`(`status` ASC) USING BTREE,
+  CONSTRAINT `res_task_ibfk_1` FOREIGN KEY (`project_id`) REFERENCES `res_project` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `res_task_ibfk_2` FOREIGN KEY (`student_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
+  CONSTRAINT `res_task_ibfk_3` FOREIGN KEY (`teacher_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '研究任务表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of res_task
+-- ----------------------------
+INSERT INTO `res_task` VALUES (1, 1, 108, 101, '中医症状文本预处理算法设计（更新版测试）', '任务描述已更新，增加了情感分析模块...', '更新的任务要求...', '2024-05-15', 'high', 'in_progress', 75.50, '2024-01-20 09:00:00', '2025-07-09 12:05:19');
+INSERT INTO `res_task` VALUES (2, 1, 109, 101, '网络药理学分析平台搭建', '基于Python和R语言，搭建网络药理学分析的计算平台，实现药物-靶点-疾病网络的可视化分析。', '1. 学习网络药理学相关算法\n2. 搭建分析平台架构\n3. 实现核心分析功能\n4. 完成平台测试', '2024-04-15', 'high', 'submitted', 95.00, '2024-01-25 10:30:00', '2025-07-09 12:31:00');
+INSERT INTO `res_task` VALUES (3, 2, 110, 108, '重庆地区常用中药材野外调查', '实地调查重庆市主要区县的中药材分布情况，记录GPS坐标、生长环境、资源量等信息。', '1. 制定调查计划和路线\n2. 完成至少5个区县的实地调查\n3. 拍摄药材照片并记录详细信息\n4. 整理调查数据并提交报告', '2024-09-30', 'medium', 'assigned', 0.00, '2024-07-10 08:00:00', '2024-07-10 08:00:00');
+INSERT INTO `res_task` VALUES (4, 3, 112, 109, '中医症状智能识别模块开发', '开发基于自然语言处理的中医症状智能识别模块，能够从患者主诉中提取关键症状信息。', '1. 收集中医症状标准术语库\n2. 训练命名实体识别模型\n3. 开发症状提取算法\n4. 测试模块准确率', '2024-12-15', 'high', 'in_progress', 60.00, '2024-03-15 14:00:00', '2024-06-20 11:45:00');
+INSERT INTO `res_task` VALUES (5, 1, 108, 109, '中医症状文本预处理算法设计', '设计并实现中医症状描述的标准化预处理算法，包括文本清洗、症状实体识别、同义词归并等功能。', '1. 熟悉自然语言处理基础知识\n2. 掌握Python编程和相关NLP库\n3. 了解中医症状术语体系\n4. 完成算法设计文档和代码实现\n5. 提供测试用例和性能评估报告', '2024-04-30', 'high', 'assigned', 0.00, '2025-07-08 21:59:02', '2025-07-08 21:59:02');
+INSERT INTO `res_task` VALUES (6, 1, 109, 109, '测试用', '设计并实现中医症状描述的标准化预处理算法，包括文本清洗、症状实体识别、同义词归并等功能。', '1. 熟悉自然语言处理基础知识\n2. 掌握Python编程和相关NLP库\n3. 了解中医症状术语体系\n4. 完成算法设计文档和代码实现\n5. 提供测试用例和性能评估报告', '2024-04-30', 'high', 'assigned', 0.00, '2025-07-09 12:01:22', '2025-07-09 12:01:22');
 
 -- ----------------------------
 -- Table structure for study_record
