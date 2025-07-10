@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -42,6 +43,8 @@ public class ResearchTeacherServiceImpl implements IResearchTeacherService {
 
     @Autowired
     private ProjectApplicationDao projectApplicationDao;
+    @Autowired
+    private ProjectMemberDao projectMemberDao;
     @Override
     @Transactional
     public Long createProject(ProjectCreateDTO dto) {
@@ -164,6 +167,17 @@ public class ResearchTeacherServiceImpl implements IResearchTeacherService {
         application.setReviewComment(dto.getReviewComment());
 
         applicationDao.updateById(application);
+        // 🔥 添加这部分：如果审核通过，添加到成员表
+        if ("approve".equals(dto.getAction())) {
+            ProjectMember member = new ProjectMember();
+            member.setProjectId(application.getProjectId());
+            member.setUserId(application.getStudentId());
+            member.setRole("researcher");
+            member.setJoinDate(LocalDate.now());
+            member.setStatus("active");
+
+            projectMemberDao.insert(member);
+        }
     }
 
     @Override
