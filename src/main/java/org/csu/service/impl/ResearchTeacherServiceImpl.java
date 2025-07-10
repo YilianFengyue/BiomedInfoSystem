@@ -40,6 +40,8 @@ public class ResearchTeacherServiceImpl implements IResearchTeacherService {
     @Autowired
     private ProgressLogDao progressLogDao;
 
+    @Autowired
+    private ProjectApplicationDao projectApplicationDao;
     @Override
     @Transactional
     public Long createProject(ProjectCreateDTO dto) {
@@ -327,8 +329,12 @@ public class ResearchTeacherServiceImpl implements IResearchTeacherService {
 
     // 辅助方法
     private Integer getMemberCount(Long projectId) {
-        // 实现获取项目成员数量的逻辑
-        return 0;
+        QueryWrapper<ProjectApplication> wrapper = new QueryWrapper<>();
+        wrapper.eq("project_id", projectId)
+                .eq("status", "approved");
+
+        Long count = projectApplicationDao.selectCount(wrapper);
+        return Math.toIntExact(count);
     }
 
     private Integer getTaskCount(Long projectId) {
